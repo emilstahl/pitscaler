@@ -1,0 +1,12 @@
+name = "pitscaler"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+workers_dev = false
+
+[[routes]]
+pattern = "pitscaler.com"
+custom_domain = true
+
+[[routes]]
+pattern = "www.pitscaler.com"
+custom_domain = true
