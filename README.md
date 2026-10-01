@@ -35,3 +35,8 @@ Requests to the script Worker count toward the Free plan's limit of 100k request
 
 ## Zone security settings (Cloudflare, not Worker)
 HSTS (max-age 63072000, includeSubDomains, preload) and `X-Content-Type-Options: nosniff` are set in zone Settings → Security headers, not in `SEC` in build.mjs. Also set on the zone: min TLS 1.2, TLS 1.3, Always Use HTTPS, DNSSEC, CAA (pki.goog, letsencrypt.org, iodef mailto:emil@pitscaler.com). Bot Fight Mode and "Block AI bots" are off; managed robots.txt is off.
+
+## Contributing
+Corrections and new public sources are welcome as issues or pull requests, or by mail to emil@pitscaler.com (Signal: emil.112).
+- Only public, TLP:CLEAR material with a link to the original publisher. No TLP:AMBER/RED or confidential intel.
+- Edit `public/` and `build.mjs`; run `node build.mjs` and check that it passes (it fails if an `index.html` citation URL is missing from `SOURCES` in `public/app.js`).
