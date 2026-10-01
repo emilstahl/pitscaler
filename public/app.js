@@ -92,6 +92,7 @@ var SOURCES = {
   cydive2:     { cat: 'press', label: 'Cybersecurity Dive (Sep 29) - Citrix NetScaler exploitation began days before public notification', url: 'https://www.cybersecuritydive.com/news/citrix-netscaler-exploitation-days-before-notification/831634/' },
   heise:       { cat: 'press', label: 'heise online (Sep 27) - New zero-day exploits in Citrix NetScaler', url: 'https://www.heise.de/en/news/Security-researchers-warn-New-zero-day-exploits-in-Citrix-Netscaler-11467269.html' },
 
+  stack:       { cat: 'press', label: 'The Stack (Oct 1) - Banks, gov\'ts, telcos hit by hackers amid escalating NetScaler incident', url: 'https://www.thestack.technology/banks-govts-telcos-hit-by-hackers-amid-escalating-netscaler-incident-2/' },
   darkreading: { cat: 'press', label: 'Dark Reading (Sep 29) - Dual NetScaler Zero-Days Trigger Chaos for Citrix Customers', url: 'https://www.darkreading.com/vulnerabilities-threats/netscaler-zero-days-chaos-citrix' },
   lupovisx:    { cat: 'telemetry', label: 'Lupovis (@LupovisDefence) on X, Sep 28 - decoys catch CVE-2026-88771 exploitation hours after the PoC', url: 'https://x.com/lupovisdefence/status/2104595071362326680' },
 

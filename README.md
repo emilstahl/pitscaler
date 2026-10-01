@@ -11,7 +11,7 @@ Custom domains: pitscaler.com and www.pitscaler.com.
 1. Edit the data objects in `public/app.js`, or the prose in `public/index.html`. Tie every new statement to a SOURCES id.
 2. Update the as-of date in `index.html` (banner and footer).
 3. Build: `node build.mjs`. This regenerates `public/static.html`, `index.md`, `llms.txt`, `robots.txt` and the bundled `worker.js`.
-4. Deploy: `npx wrangler login` (only once), then `npx wrangler deploy` from this folder.
+4. Deploy: push to `main`; `.github/workflows/deploy.yml` builds and runs `wrangler deploy`. It needs repo secrets `CLOUDFLARE_API_TOKEN` (Workers Scripts:Edit, plus Zone/DNS edit for the custom domains) and `CLOUDFLARE_ACCOUNT_ID`. Manual alternative: `npx wrangler login`, then `npx wrangler deploy`.
 
 ## What the Worker serves
 - `/`: the interactive page. A client that sends `Accept: text/markdown` gets the Markdown version instead (`Vary: Accept`).
