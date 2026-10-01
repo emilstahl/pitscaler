@@ -182,6 +182,8 @@ var TIMELINE = [
     body: 'Investigation-derived indicators (IPs, .sig artefacts, a JSON artefact and a SHA-256) that Sygnia stresses are context-specific and not Citrix-published; validate NAT and direction before blocking.', cite: ['sygnia'] },
   { date: '2026-09-30', time: '22:00', kind: 'research', title: 'Unit 42 expands its threat brief',
     body: 'Adds pre- and post-disclosure activity back to 21 Aug, analysis of the nsg64.deb RC4 webshell and the .ctxs.receiver webshell, hunting queries and a formal IoC list. Updated 15:00 PT.', cite: ['unit42'] },
+  { date: '2026-10-01', time: null, kind: 'official', title: 'Citrix ships version 4 of its IoC detection logic',
+    body: 'Citrix has released a fourth version of the IoC detection logic used by the NetScaler Console scan. Citrix\'s documentation says the logic keeps being updated and that Console shows when an update is available, so rerun the scan after updating.', cite: ['ncdocs'], validated: 'Version 4 validated independently on 1 Oct.' },
   { date: '2026-10-01', time: '00:12', kind: 'reported', title: 'Beaumont: Arctic Wolf set is new "spray and pray" activity',
     body: 'He says the follow-up activity covered by the Arctic Wolf IoCs is definitely not related to the initial actor in early September.', cite: ['kb11'] },
   { date: '2026-09-10', time: '07:14', kind: 'official', title: 'CVE IDs reserved',
