@@ -182,8 +182,6 @@ var TIMELINE = [
     body: 'Investigation-derived indicators (IPs, .sig artefacts, a JSON artefact and a SHA-256) that Sygnia stresses are context-specific and not Citrix-published; validate NAT and direction before blocking.', cite: ['sygnia'] },
   { date: '2026-09-30', time: '22:00', kind: 'research', title: 'Unit 42 expands its threat brief',
     body: 'Adds pre- and post-disclosure activity back to 21 Aug, analysis of the nsg64.deb RC4 webshell and the .ctxs.receiver webshell, hunting queries and a formal IoC list. Updated 15:00 PT.', cite: ['unit42'] },
-  { date: '2026-10-01', time: null, kind: 'official', title: 'Citrix ships version 4 of its IoC detection logic',
-    body: 'Citrix has released a fourth version of the IoC detection logic used by the NetScaler Console scan. Citrix\'s documentation says the logic keeps being updated and that Console shows when an update is available, so rerun the scan after updating.', cite: ['ncdocs'], validated: 'Version 4 validated independently on 1 Oct.' },
   { date: '2026-10-01', time: '00:12', kind: 'reported', title: 'Beaumont: Arctic Wolf set is new "spray and pray" activity',
     body: 'He says the follow-up activity covered by the Arctic Wolf IoCs is definitely not related to the initial actor in early September.', cite: ['kb11'] },
   { date: '2026-09-10', time: '07:14', kind: 'official', title: 'CVE IDs reserved',
@@ -592,7 +590,7 @@ var BUILDS = [
 var FAQ = [
   { q: 'What is PitScaler?', cite: ['kb4', 'citrix'],
     a: 'PitScaler is the name Kevin Beaumont gave on 28 Sep 2026 to the exploitation of Citrix NetScaler ADC and NetScaler Gateway zero-days CVE-2026-88771 and CVE-2026-88772. Citrix disclosed them, with six other CVEs, in bulletin CTX697096 on 27 Sep 2026.' },
-  { q: 'Which NetScaler vulnerabilities are exploited?', cite: ['citrix', 'kev'],
+  { q: 'Which NetScaler vulnerabilities are exploited?', cite: ['citrix', 'kev', 'kb1'],
     a: 'CVE-2026-88771 (unauthenticated remote command execution in the default configuration, CVSS 4.0 9.5) and CVE-2026-88772 (DTLS memory overflow leading to RCE or DoS, CVSS 4.0 9.5). CISA added both to its KEV catalog on 27 Sep 2026 with a 30 Sep deadline. Kevin Beaumont reports CVE-2026-88773 was chained with the two, but no other source has independently confirmed that. No exploitation is reported for CVE-2026-88774 to CVE-2026-88778.' },
   { q: 'Which NetScaler versions fix CVE-2026-88771 and CVE-2026-88772?', cite: ['citrix'],
     a: 'Per CTX697096: NetScaler ADC/Gateway 14.1-73.37 and later; 13.1-64.23 and later; ADC 14.1-FIPS 14.1-73.37 FIPS and later; ADC 13.1-FIPS and 13.1-NDcPP 13.1.37.279 and later (the bulletin also writes this build as 13.1-37.279).' },
