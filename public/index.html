@@ -71,6 +71,11 @@
       <p>According to Beaumont, attackers were dropping webshells all through September, before the fixes were available. <a class="cite" href="https://cyberplace.social/@GossiTheDog/117343729453093307">[Beaumont]</a> After patching, check every appliance for compromise. Kevin Beaumont says <q>patching alone doesn't remove the backdoors being placed</q>. <a class="cite" href="https://cyberplace.social/@GossiTheDog/117343821114841048">[Beaumont]</a> The CIRCL and CERT-EU hunting guidance says the same. <a class="cite" href="https://www.circl.lu/pub/tr-100/">[CIRCL TR-100]</a> <a class="cite" href="https://www.cert.europa.eu/blog/taking-execute-logging-a-bit-too-literally-cve-2026-88771">[CERT-EU]</a></p>
     </aside>
 
+    <aside class="callout callout-soft" aria-label="Developing: separate SAML issue">
+      <p class="callout-title">Developing, 2 October: a separate SAML issue</p>
+      <p>Citrix has published guidance on a newly observed, configuration-dependent issue in NetScaler deployments that use SAML authentication, and says it is independent of CTX697096. A security bulletin and product update are planned. No CVE or fixed builds have been published yet. If your configuration contains <code>add authentication samlAction</code> or <code>add authentication samlIdPProfile</code>, follow Citrix's guidance and contact Citrix Support if you see impact. <a class="cite" href="https://community.citrix.com/techzone-blogs/110_security-updates/security-update-guidance-for-netscaler-saml-authentication-deployments/">[Citrix community blog]</a> Beaumont reports his patched honeypots crashing, which is one researcher's observation. <a class="cite" href="https://cyberplace.social/@GossiTheDog/117372857146978531">[Beaumont]</a> The rest of this page covers CVE-2026-88771 and CVE-2026-88772.</p>
+    </aside>
+
     <div class="legend" aria-label="How to read this page">
       <span class="tag tag-official">Official</span> Citrix bulletin and government advisories
       <span class="tag tag-research">Research</span> third-party technical analysis
@@ -213,9 +218,17 @@
         <p class="src">Source: <a href="https://tenex.ai/blog/what-tenex-observed-inside-active-exploitation-of-netscaler-zero-day/">TENEX</a>. Appliance logs show attempts reaching the handler, not that commands ran.</p>
       </article>
       <article class="card">
-        <h3>Poppelgaard checker <span class="tag tag-research">Script, v1.9</span></h3>
-        <p>A free, read-only shell script for the appliance (<code>sh ctx697096_check.sh --ioc</code>) that checks fixed-build status and public indicators, and tags each attack line as before or after the fix. Release 1.9 (1 Oct) adds Arctic Wolf's nsmon.pl implant, the Unit 42 <code>.deb</code> webshell and more attacker IPs. Its author says a clean result is not proof of a clean box; run it before rebooting or upgrading, and use it together with the Citrix IoC scan.</p>
+        <h3>Poppelgaard checker <span class="tag tag-research">Script, v1.11</span></h3>
+        <p>A free, read-only shell script for the appliance (<code>sh ctx697096_check.sh --ioc</code>) that checks fixed-build status and public indicators, and tags each attack line as before or after the fix. Release 1.11 (2 Oct) adds a SAML status check based on Citrix's new guidance. Release 1.9 (1 Oct) adds Arctic Wolf's nsmon.pl implant, the Unit 42 <code>.deb</code> webshell and more attacker IPs. Its author says a clean result is not proof of a clean box; run it before rebooting or upgrading, and use it together with the Citrix IoC scan.</p>
         <p class="src">Source: <a href="https://github.com/ThomasPoppelgaard/netscaler-ctx697096-checker">Poppelgaard on GitHub</a>. A third-party tool; read it before you run it on a production appliance.</p>
+      </article>
+      <article class="card">
+        <h3>New SAML issue (2 Oct) <span class="tag tag-official">Citrix guidance</span></h3>
+        <ul>
+          <li>Check your configuration for <code>add authentication samlAction.*</code> and <code>add authentication samlIdPProfile.*</code>. Citrix says an appliance with either, on a Gateway or AAA virtual server, is affected. <a class="cite" href="https://community.citrix.com/techzone-blogs/110_security-updates/security-update-guidance-for-netscaler-saml-authentication-deployments/">[Citrix community blog]</a></li>
+          <li>Beaumont's grep for authentication-daemon crashes and restarts in <code>/var/log/ns.log</code>: <code>proc nsaaad.*(SIGNALED|EXITED)|maximum number of restarts|Pitboss declaring system failure|All monitored processes have exited, rebooting</code>. A match is a lead, not proof. <a class="cite" href="https://cyberplace.social/@GossiTheDog/117372857146978531">[Beaumont]</a></li>
+        </ul>
+        <p class="src">Citrix says this is independent of CTX697096 and a bulletin is planned. Check the Citrix post for updates.</p>
       </article>
       <article class="card">
         <h3>Unit 42 hunting query <span class="tag tag-research">XQL</span></h3>
