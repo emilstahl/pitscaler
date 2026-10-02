@@ -16,6 +16,7 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
   const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const UPD_ISO = UPD.toISOString().replace(/\.\d+Z$/, 'Z');
   const UPD_DATE = UPD_ISO.slice(0, 10);
+  const UPD_DAY = UPD.getUTCDate() + ' ' + MONTHS[UPD.getUTCMonth()] + ' ' + UPD.getUTCFullYear();
   const UPD_HUMAN = UPD.getUTCDate() + ' ' + MONTHS[UPD.getUTCMonth()] + ' ' + UPD.getUTCFullYear() + ', ' + UPD_ISO.slice(11, 16) + ' UTC';
   const tok = (s) => s.replaceAll('{{UPDATED_ISO}}', UPD_ISO).replaceAll('{{UPDATED_DATE}}', UPD_DATE).replaceAll('{{UPDATED_HUMAN}}', UPD_HUMAN);
   indexHtml = tok(indexHtml); appJs = tok(appJs);
@@ -171,7 +172,7 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
       '<dt>Severity</dt><dd>' + esc(c.score) + '</dd><dt>Exploitation</dt><dd>' + esc(c.status) + '</dd><dt>CISA KEV</dt><dd>' + (kev ? 'Yes, added 27 Sep 2026, federal deadline 30 Sep 2026' + cites(['kev']) : 'No') + '</dd>' +
       '<dt>Disclosed</dt><dd><time datetime="2026-09-27">27 Sep 2026</time></dd><dt>Fixed builds</dt><dd><a href="/netscaler-remediation/">14.1-73.37, 13.1-64.23 and FIPS/NDcPP builds</a></dd></dl>';
     const lede = '<p>' + esc(c.id) + ' is a Citrix NetScaler ADC and Gateway vulnerability: ' + esc(SHORT[c.id]) + ', rated ' + esc(c.score.replace('CVSS 4.0: ', 'CVSS 4.0 ')) + '. ' +
-      (kev ? 'It was exploited in the wild as a zero-day before Citrix disclosed it on 27 September 2026.' : c.kind === 'chain' ? 'Kevin Beaumont reports it was chained with CVE-2026-88771 and CVE-2026-88772 in the attacks. As of 1 October 2026 no other source has independently confirmed its exploitation.' : 'No exploitation has been reported as of 1 October 2026.') + cites(kev ? ['citrix', 'cisa'] : c.kind === 'chain' ? ['citrix', 'kb1'] : ['citrix']) + '</p>';
+      (kev ? 'It was exploited in the wild as a zero-day before Citrix disclosed it on 27 September 2026.' : c.kind === 'chain' ? 'Kevin Beaumont reports it was chained with CVE-2026-88771 and CVE-2026-88772 in the attacks. As of 1 October 2026 no other source has independently confirmed its exploitation.' : 'No exploitation has been reported as of ' + UPD_DAY + '.') + cites(kev ? ['citrix', 'cisa'] : c.kind === 'chain' ? ['citrix', 'kb1'] : ['citrix']) + '</p>';
     const tl = tlLines.filter(l => l.includes(c.id));
     const faq = D.FAQ.filter(f => f.a.includes(c.id) || f.q.includes(c.id)).map(f => '<div class="faq"><h3>' + esc(f.q) + '</h3><p>' + esc(f.a) + cites(f.cite) + '</p></div>').join('');
     const body = '<section class="wrap">' + lede + facts + '<div class="cves">' + cveCards[i] + '</div></section>' + recordsHtml(c) +
