@@ -66,14 +66,20 @@
       <div><dt>CISA KEV federal deadline</dt><dd><time datetime="2026-09-30">30 Sep 2026</time></dd><p>US time, so it had only just passed at this snapshot</p></div>
     </dl>
 
+    <aside class="callout callout-alert" aria-label="New: separate SAML issue">
+      <p class="callout-title">New, 2 October: separate SAML issue (not CTX697096) — check your config</p>
+      <p>Citrix has published guidance on a newly observed, configuration-dependent issue in NetScaler deployments that use SAML authentication on a Gateway or AAA virtual server. It is independent of CTX697096; a security bulletin and product update are planned, and no CVE or fixed builds have been published yet. <strong>An appliance is affected when its configuration contains <code>add authentication samlAction</code> (NetScaler as SAML service provider) or <code>add authentication samlIdPProfile</code> (NetScaler as SAML identity provider).</strong> Check with <code>show running | grep -i saml</code> or grep <code>ns.conf</code>, follow Citrix's guidance, and contact Citrix Support if you see impact. Beaumont reports his patched honeypots crashing, which is one researcher's observation. <sup class="ref"><a href="#ref-2" title="Citrix community blog - Security Update: Guidance for NetScaler SAML Authentication Deployments (Oct 2; new issue, independent of CTX697096)">[2]</a></sup> <sup class="ref"><a href="#ref-69" title="Beaumont, Oct 2 19:01 UTC - patched 13.1 and 14.1 honeypots are crashing; &quot;we may have #PitScaler 2 on our hands&quot; (with two screenshots of an unattributed write-up)">[69]</a></sup> The rest of this page covers CVE-2026-88771 and CVE-2026-88772.</p>
+      <p><strong>Documentation:</strong>
+        <a href="https://community.citrix.com/techzone-blogs/110_security-updates/security-update-guidance-for-netscaler-saml-authentication-deployments/">Citrix SAML guidance</a> ·
+        <a href="https://docs.netscaler.com/en-us/citrix-adc/current-release/aaa-tm/authentication-methods/saml-authentication">SAML authentication (SP)</a> ·
+        <a href="https://docs.netscaler.com/en-us/citrix-adc/current-release/aaa-tm/authentication-methods/saml-authentication/citrix-adc-saml-idp">NetScaler as a SAML IdP</a> ·
+        <a href="https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/authentication/authentication-samlaction"><code>samlAction</code> command reference</a> ·
+        <a href="https://developer-docs.netscaler.com/en-us/adc-command-reference-int/current-release/authentication/authentication-samlidpprofile"><code>samlIdPProfile</code> command reference</a></p>
+    </aside>
+
     <aside class="callout" aria-label="Key warning">
       <p class="callout-title">Patch, then investigate: patching does not remove existing backdoors.</p>
       <p>According to Beaumont, attackers were dropping webshells all through September, before the fixes were available. <a class="cite" href="https://cyberplace.social/@GossiTheDog/117343729453093307">[Beaumont]</a> After patching, check every appliance for compromise. Kevin Beaumont says <q>patching alone doesn't remove the backdoors being placed</q>. <a class="cite" href="https://cyberplace.social/@GossiTheDog/117343821114841048">[Beaumont]</a> The CIRCL and CERT-EU hunting guidance says the same. <a class="cite" href="https://www.circl.lu/pub/tr-100/">[CIRCL TR-100]</a> <a class="cite" href="https://www.cert.europa.eu/blog/taking-execute-logging-a-bit-too-literally-cve-2026-88771">[CERT-EU]</a></p>
-    </aside>
-
-    <aside class="callout callout-soft" aria-label="Developing: separate SAML issue">
-      <p class="callout-title">Developing, 2 October: a separate SAML issue</p>
-      <p>Citrix has published guidance on a newly observed, configuration-dependent issue in NetScaler deployments that use SAML authentication, and says it is independent of CTX697096. A security bulletin and product update are planned. No CVE or fixed builds have been published yet. If your configuration contains <code>add authentication samlAction</code> or <code>add authentication samlIdPProfile</code>, follow Citrix's guidance and contact Citrix Support if you see impact. <a class="cite" href="https://community.citrix.com/techzone-blogs/110_security-updates/security-update-guidance-for-netscaler-saml-authentication-deployments/">[Citrix community blog]</a> Beaumont reports his patched honeypots crashing, which is one researcher's observation. <a class="cite" href="https://cyberplace.social/@GossiTheDog/117372857146978531">[Beaumont]</a> The rest of this page covers CVE-2026-88771 and CVE-2026-88772.</p>
     </aside>
 
     <div class="legend" aria-label="How to read this page">
