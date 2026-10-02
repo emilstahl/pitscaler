@@ -347,7 +347,7 @@ export default {
     const plainHttp = u.protocol === 'http:' || req.headers.get('x-forwarded-proto') === 'http' || (req.cf && !req.cf.tlsVersion);
     if (plainHttp || u.hostname === 'www.pitscaler.com') return redir('https://pitscaler.com' + (F[u.pathname] || !F[u.pathname + '/'] ? u.pathname : u.pathname + '/') + u.search, 301);
     if (req.method !== 'GET' && req.method !== 'HEAD') return new Response('Method not allowed', { status: 405, headers: hdr('text/plain; charset=utf-8') });
-    let path = u.pathname === '/index.html' ? '/' : u.pathname;
+    let path = u.pathname === '/index.html' ? '/' : u.pathname.replace(/\/{2,}/g, '/');
     let vary = {};
     if (path === '/') {
       const a = req.headers.get('accept') || '';
