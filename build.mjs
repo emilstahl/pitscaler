@@ -28,7 +28,7 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
     D.CVES.map(c => '<li><a href="/' + c.id.toLowerCase() + '/">' + c.id + '</a></li>').join('') + '</ul></div><div><h2>Guides</h2><ul>' +
     [['/', 'Overview'], ['/netscaler-timeline/', 'Timeline'], ['/netscaler-iocs/', 'IoCs'], ['/netscaler-detection/', 'Detection'], ['/netscaler-remediation/', 'Remediation and fixed builds'], ['/faq/', 'FAQ'], ['/about/', 'About and methodology'], ['/#sources', 'References']]
       .map(n => '<li><a href="' + n[0] + '">' + n[1] + '</a></li>').join('') + '</ul></div><div><h2>Formats</h2><ul>' +
-    [['/iocs.csv', 'IoCs as CSV'], ['/index.md', 'Markdown'], ['/llms.txt', 'llms.txt'], ['/static.html', 'No-JavaScript page'], ['/sitemap.xml', 'Sitemap']]
+    [['/iocs.csv', 'IoCs as CSV'], ['/blocklist.txt', 'Firewall blocklist'], ['/blocklist-plain.txt', 'Plain IP blocklist'], ['/index.md', 'Markdown'], ['/llms.txt', 'llms.txt'], ['/static.html', 'No-JavaScript page'], ['/sitemap.xml', 'Sitemap']]
       .map(n => '<li><a href="' + n[0] + '">' + n[1] + '</a></li>').join('') + '</ul></div></nav>';
   indexHtml = indexHtml.replace('<!--CVEMENU-->', cveMenu('#home')).replace('<!--FOOTNAV-->', FOOTNAV);
   const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -257,7 +257,9 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
     '- [No-JavaScript HTML](https://pitscaler.com/static.html): complete text without scripts',
     '- [Full Markdown briefing](https://pitscaler.com/index.md): extractable source-linked text',
     '- [Full text](https://pitscaler.com/llms-full.txt): same historical briefing as Markdown',
-    '- [Public IoCs as CSV](https://pitscaler.com/iocs.csv): type, value, context, caveat, sharing, sources', '',
+    '- [Public IoCs as CSV](https://pitscaler.com/iocs.csv): type, value, context, caveat, sharing, sources',
+    '- [Firewall edge blocklist](https://pitscaler.com/blocklist.txt): the IPv4 rows that are safe to block, with the shared-infrastructure exclusions listed (Cloudflare WARP, VPN exits, residential/ISP, parking)',
+    '- [Plain IP blocklist](https://pitscaler.com/blocklist-plain.txt): one IP per line, same set', '',
     '## Dedicated pages', ''].concat(pages.map(p => '- [' + (out[p][0].match(/<title>(.*?)<\/title>/)[1].replace(/ \| PitScaler$/, '').replace(/&amp;/g, '&')) + '](https://pitscaler.com' + p + ')'), ['',
     '## Key sections', '',
     '- [Eight CVEs](https://pitscaler.com/#cves)'].concat(D.CVES.map(c => '- [' + c.id + '](https://pitscaler.com/#' + c.id.toLowerCase() + ')'), [
@@ -275,10 +277,31 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
   const q = v => '"' + String(v).replace(/"/g, '""') + '"';
   const csv = '\ufeff' + ['type', 'value', 'context', 'caveat', 'sharing', 'sources'].join(',') + '\r\n' +
     D.IOCS.map(r => [r.type, r.value, r.context, r.caveat, r.share, r.cite.map(id => D.SOURCES[id].url).join(' ')].map(q).join(',')).join('\r\n') + '\r\n';
+
+  // Firewall-edge blocklist: only IPv4 rows whose own caveat does not warn against blocking
+  // (Cloudflare WARP egress, shared VPN exits, residential/ISP CGNAT, domain-parking IPs are excluded).
+  const blockable = D.IOCS.filter(r => r.type === 'IPv4' && !/do not block on it|never block|cloudflare warp/i.test(r.caveat) && !/cloudflare warp|cloudflare, inc/i.test(r.context) && !/shared by many users|likely a commercial vpn/i.test(r.caveat) && !/sedo domain-parking/i.test(r.caveat));
+  const blockedExcluded = D.IOCS.filter(r => r.type === 'IPv4' && !blockable.includes(r));
+  const gen = new Date().toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
+  const blHeader = [
+    '# PitScaler CVE-2026-88771/88772 public-IoC IPv4 edge-blocklist',
+    '# Generated ' + gen + ' from https://pitscaler.com/iocs.csv',
+    '# ' + blockable.length + ' IPs included; ' + blockedExcluded.length + ' IPv4 rows excluded as shared infrastructure',
+    '#   (Cloudflare WARP egress, shared commercial VPN exits, residential/ISP CGNAT addresses, a domain-parking IP).',
+    '# Read the caveats: https://pitscaler.com/iocs.csv - attacker IPs differ per victim (Beaumont).',
+    '# Blocking these is defence in depth, not incident response. A clean log proves nothing.',
+    '#',
+    '# Excluded:',
+    ...blockedExcluded.map(r => '#   ' + r.value.padEnd(16) + ' ' + (r.context.split('.')[0] || r.caveat.split(';')[0]).slice(0, 80)),
+    '#',
+  ];
+  const blocklist = blHeader.join('\n') + '\n' + blockable.map(r => r.value).sort((a, b) => a.split('.').map(Number).reduce((x, n, i) => x * 256 + n, 0) - b.split('.').map(Number).reduce((x, n, i) => x * 256 + n, 0)).join('\n') + '\n';
+  const blocklistTxt = '# See blocklist.txt for the annotated list. Plain one-IP-per-line version:\n\n' + blockable.map(r => r.value).sort((a, b) => a.split('.').map(Number).reduce((x, n, i) => x * 256 + n, 0) - b.split('.').map(Number).reduce((x, n, i) => x * 256 + n, 0)).join('\n') + '\n';
+
   const favicon = readIcon();
   return {
     ...out,
-    '/iocs.csv': [csv, 'text/csv; charset=utf-8'], '/favicon.svg': [favicon, 'image/svg+xml'], '/favicon.ico': [favicon, 'image/svg+xml'], '/logo.svg': [favicon, 'image/svg+xml'],
+    '/iocs.csv': [csv, 'text/csv; charset=utf-8'], '/blocklist.txt': [blocklist, 'text/plain; charset=utf-8'], '/blocklist-plain.txt': [blocklistTxt, 'text/plain; charset=utf-8'], '/favicon.svg': [favicon, 'image/svg+xml'], '/favicon.ico': [favicon, 'image/svg+xml'], '/logo.svg': [favicon, 'image/svg+xml'],
     ...(INDEXNOW_KEY ? { ['/' + INDEXNOW_KEY + '.txt']: [INDEXNOW_KEY, 'text/plain; charset=utf-8'] } : {}),
     '/': [pre, 'text/html; charset=utf-8'], '/style.css': [css, 'text/css; charset=utf-8'], '/app.js': [appJs, 'text/javascript; charset=utf-8'],
     '/static.html': [st, 'text/html; charset=utf-8'], '/index.md': [md, 'text/markdown; charset=utf-8'], '/llms-full.txt': [md, 'text/plain; charset=utf-8'],
@@ -338,6 +361,7 @@ export default {
     if (f[1].startsWith('text/markdown')) extra['x-markdown-tokens'] = String(Math.ceil(f[0].length / 4));
     if (['/index.md', '/llms.txt', '/llms-full.txt'].includes(path)) extra.link = '<https://pitscaler.com/>; rel="canonical"';
     if (path === '/iocs.csv') extra['content-disposition'] = 'attachment; filename="pitscaler-iocs.csv"';
+    if (path === '/blocklist.txt' || path === '/blocklist-plain.txt') extra['content-disposition'] = 'attachment; filename="' + path.slice(1) + '"';
     return new Response(req.method === 'HEAD' ? null : f[0], { headers: hdr(f[1], extra) });
   }
 };

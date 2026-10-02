@@ -180,7 +180,8 @@
       <p><strong>Indicators are not proof of compromise by themselves.</strong> Validate any hit against appliance logs, filesystem integrity, process history and configuration changes, following your incident-response procedure.</p>
       <p><strong>How to read these.</strong> Each indicator was observed by the source named in its row. None of them is a universal indicator for every victim. Beaumont reports that webshell names and attacker IPs are unique per victim. <a class="cite" href="https://cyberplace.social/@GossiTheDog/117351107654208046">[Beaumont]</a> <a class="cite" href="https://cyberplace.social/@GossiTheDog/117355208096613386">[Beaumont]</a> An empty search result proves nothing.</p>
     </div>
-    <p class="export"><a class="button" href="/iocs.csv" download>Download all IoCs as CSV</a></p>
+    <p class="export"><a class="button" href="/iocs.csv" download>Download all IoCs as CSV</a> <a class="button" href="/blocklist.txt" download>Firewall blocklist (93 IPs, annotated)</a> <a class="button" href="/blocklist-plain.txt" download>Plain IP list</a></p>
+    <p class="note">The blocklist contains only the IPv4 indicators whose own source data does not warn against blocking. It excludes Cloudflare WARP egress, shared commercial VPN exits, residential/ISP (CGNAT) addresses and a domain-parking IP — those are in the CSV with their caveats. IPs differ per victim; a blocklist is defence in depth, not a substitute for patching and compromise checks.</p>
     <label class="search" for="ioc-q">Filter indicators <input id="ioc-q" type="search" autocomplete="off" placeholder="e.g. sha256, receiver, 149.104"></label>
     <div class="table-wrap" tabindex="0" role="region" aria-label="IoC table, scrollable">
       <table class="ioc">
