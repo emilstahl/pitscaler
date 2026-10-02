@@ -57,6 +57,8 @@ var SOURCES = {
   kb11:        { cat: 'beaumont', label: 'Beaumont, Oct 1 00:12 UTC - Arctic Wolf IoCs cover follow-up "spray and pray" activity, not the early-September actor', url: 'https://cyberplace.social/@GossiTheDog/117362758120876296' },
   kb12:        { cat: 'beaumont', label: 'Beaumont, Oct 2 19:01 UTC - patched 13.1 and 14.1 honeypots are crashing; "we may have #PitScaler 2 on our hands" (with two screenshots of an unattributed write-up)', url: 'https://cyberplace.social/@GossiTheDog/117372857146978531' },
   kb13:        { cat: 'beaumont', label: 'Beaumont, Oct 2 20:00 UTC - Citrix has published a blog on the new SAML issue', url: 'https://cyberplace.social/@GossiTheDog/117373090409884785' },
+  kb14:        { cat: 'beaumont', label: 'Beaumont, Oct 2 19:02 UTC - "to be confirmed but it looks like the pitboss fix is bypassable"', url: 'https://cyberplace.social/@GossiTheDog/117372864244958549' },
+  kb15:        { cat: 'beaumont', label: 'Beaumont, Oct 2 19:19 UTC - one patched honeypot is running a downloaded binary; "sprayed and prayed"', url: 'https://cyberplace.social/@GossiTheDog/117372929427365765' },
   nlgov:       { cat: 'official', label: 'Dutch government letter to parliament - Kwetsbaarheden Citrix Netscaler (2026D47262, Sep 29)', url: 'https://www.tweedekamer.nl/kamerstukken/brieven_regering/detail?id=2026D47262&did=2026D47262' },
 
   cverec:      { cat: 'official', label: 'CVE.org - CVE-2026-88771 record (reserved Sep 10 07:14 UTC by NetScaler; published Sep 27 16:02 UTC)', url: 'https://www.cve.org/CVERecord?id=CVE-2026-88771' },
@@ -185,6 +187,12 @@ var CVES = [
 /* ---------- Timeline (UTC; time: null = no time given) ---------- */
 /* kind: official | research | telemetry | reported. approx: date is approximate. deadline: future deadline. */
 var TIMELINE = [
+  { date: '2026-10-02', time: '19:02', kind: 'reported', title: 'Beaumont: the pitboss fix "looks bypassable" (to be confirmed)',
+    body: 'In a reply to his honeypot post, Beaumont says that, to be confirmed, it looks like the pitboss fix is bypassable. He gives no technical detail, and Citrix has not said whether builds with the CTX697096 fixes are affected by the new SAML issue.', cite: ['kb14'],
+    validated: 'Post text read directly on 2 Oct.' },
+  { date: '2026-10-02', time: '19:19', kind: 'reported', title: 'Beaumont: a patched honeypot is running a downloaded binary',
+    body: 'Beaumont says one of his honeypots is running a downloaded (malware) binary, that both were patched so he concludes it is a new vulnerability, and that it is being sprayed and prayed. One honeypot has no valid TLS certificate because he let it expire. He does not say whether the honeypots had SAML configured, and Citrix lists no affected versions yet. These are one researcher\'s observations and conclusions.', cite: ['kb15'],
+    validated: 'Post text read directly on 2 Oct.' },
   { date: '2026-10-02', time: '19:01', kind: 'reported', title: 'Beaumont: patched honeypots crash, "we may have PitScaler 2"',
     body: 'Beaumont says his patched 13.1 and 14.1 honeypots are crashing, from multiple source IPs, and posts greps for authentication-daemon (nsaaad) crashes and pitboss restart messages in ns.log, one of them for 213.209.159.55. The two screenshots in the post show a write-up (author not named) about two 14.1-73.37 appliances that rebooted repeatedly after nsaaad crashed with exit status 0x8a and hit the restart limit of six. On one of them, crafted usernames on SAML factors told the appliance to fetch a payload from 213.209.159.55 over plain HTTP on port 443, save it as /v and run it, just before each crash. The write-up says this shows exploitation attempts and correlated crashes, not confirmed command execution, a CVE or a firmware regression, and adds *.pyrlnk.cc as a later delivery source. This is unverified: at the time there was no CVE and no vendor or CERT statement.', cite: ['kb12'],
     validated: 'Post text and both screenshots read directly on 2 Oct.' },
