@@ -4,3 +4,5 @@ worker.js
 .wrangler/
 .claude/
 .DS_Store
+.indexnow-key
+README.private.md

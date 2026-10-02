@@ -2,12 +2,23 @@
 // and bundles everything into worker.js. Usage: node build.mjs
 // build() is pure (strings in, files out) so the same code can run in the Cloudflare API sandbox.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 
-export const INDEXNOW_KEY = '5f3c9a8e2b7d4e61a0c9f4b2d8e7a613';
+import { readFileSync as _rf, existsSync as _ex } from 'node:fs';
+// IndexNow key: kept out of git. Set INDEXNOW_KEY or put it in .indexnow-key (gitignored).
+export const INDEXNOW_KEY = (process.env.INDEXNOW_KEY || (_ex(new URL('./.indexnow-key', import.meta.url)) ? _rf(new URL('./.indexnow-key', import.meta.url), 'utf8') : '')).trim();
 let ICON = '';
 const readIcon = () => ICON;
-export function build(indexHtml, appJs, css, icon) {
+export function build(indexHtml, appJs, css, icon, updatedIso) {
   ICON = icon || '';
+  // Last-updated stamp (UTC), from the latest content commit; tokens are replaced in index.html and app.js
+  const UPD = new Date(updatedIso || '2026-10-01T00:00:00Z');
+  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const UPD_ISO = UPD.toISOString().replace(/\.\d+Z$/, 'Z');
+  const UPD_DATE = UPD_ISO.slice(0, 10);
+  const UPD_HUMAN = UPD.getUTCDate() + ' ' + MONTHS[UPD.getUTCMonth()] + ' ' + UPD.getUTCFullYear() + ', ' + UPD_ISO.slice(11, 16) + ' UTC';
+  const tok = (s) => s.replaceAll('{{UPDATED_ISO}}', UPD_ISO).replaceAll('{{UPDATED_DATE}}', UPD_DATE).replaceAll('{{UPDATED_HUMAN}}', UPD_HUMAN);
+  indexHtml = tok(indexHtml); appJs = tok(appJs);
   const dataSrc = appJs.slice(0, appJs.indexOf('/* ================= Rendering'));
   const D = new Function(dataSrc + '\nreturn { SOURCES, SOURCE_CATS, CVES, TIMELINE, IOCS, BUILDS, FAQ };')();
   const cveMenu = here => '<li class="dd"><details><summary>CVEs</summary><ul>' + (here === '#home' ? '<li><a href="#cves">All eight CVEs</a></li>' : '') + D.CVES.map(c => { const p = '/' + c.id.toLowerCase() + '/';
@@ -68,14 +79,14 @@ export function build(indexHtml, appJs, css, icon) {
     const id = REF_ORDER[n - 1];
     return '<sup class="ref">' + refA(id) + '</sup>';
   }).replace(/<\/sup> <sup class="ref">/g, '');
-  const MOD = '2026-10-01';        // last substantive content change: update with the as-of date, not on every deploy
+  const MOD = UPD_DATE;            // date of the latest content commit (see main block)
   const PUBLISHED = '2026-09-29';  // first publication (domain registered and first deployed 29 Sep 2026)
   const ld = { '@context': 'https://schema.org', '@graph': [
     { '@type': 'WebSite', '@id': 'https://pitscaler.com/#website', url: 'https://pitscaler.com/', name: 'PitScaler', inLanguage: 'en' },
     { '@type': 'Organization', '@id': 'https://pitscaler.com/#publisher', name: 'PitScaler', url: 'https://pitscaler.com/', email: 'emil@pitscaler.com', logo: 'https://pitscaler.com/logo.svg' },
     { '@type': 'TechArticle', '@id': 'https://pitscaler.com/#briefing', mainEntityOfPage: { '@type': 'WebPage', '@id': 'https://pitscaler.com/' }, url: 'https://pitscaler.com/',
       headline: 'Citrix NetScaler zero-day vulnerabilities CVE-2026-88771 and CVE-2026-88772',
-      description: 'Source-linked historical briefing on the two exploited NetScaler zero-days, all eight CVEs in CTX697096, timeline, public IoCs, detection and remediation. Snapshot: 1 October 2026.',
+      description: 'Source-linked historical briefing on the two exploited NetScaler zero-days, all eight CVEs in CTX697096, timeline, public IoCs, detection and remediation. Last updated: ' + UPD_HUMAN + '.',
       inLanguage: 'en', isAccessibleForFree: true, datePublished: PUBLISHED, dateModified: MOD,
       author: { '@id': 'https://pitscaler.com/#publisher' }, publisher: { '@id': 'https://pitscaler.com/#publisher' }, isPartOf: { '@id': 'https://pitscaler.com/#website' },
       about: [{ '@type': 'Thing', name: 'Citrix NetScaler ADC and Gateway' }].concat(D.CVES.slice(0, 2).map(c => ({ '@type': 'Thing', name: c.id, sameAs: 'https://www.cve.org/CVERecord?id=' + c.id }))),
@@ -119,7 +130,7 @@ export function build(indexHtml, appJs, css, icon) {
       '<meta property="og:type" content="article">\n<meta property="og:site_name" content="PitScaler">\n<meta property="og:locale" content="en_US">\n<meta property="og:url" content="' + url + '">\n' +
       '<meta property="og:title" content="' + esc(title) + '">\n<meta property="og:description" content="' + esc(desc) + '">\n<meta name="twitter:card" content="summary">\n' +
       '<script type="application/ld+json">' + JSON.stringify(ld).replace(/</g, '\\u003c') + '</script>\n</head>\n<body>\n<a class="skip" href="#main">Skip to content</a>\n' +
-      '<div class="banner" role="note">Snapshot of <time datetime="2026-10-01">1 October 2026, morning CEST</time>. Not a live feed; check official advisories for current status. <span class="contrib">Contribute: <a href="https://github.com/emilstahl/pitscaler">GitHub</a> · <a href="mailto:emil@pitscaler.com">emil@pitscaler.com</a> · Signal <code>emil.112</code></span></div>\n' +
+      '<div class="banner" role="note">Last updated <time datetime="' + UPD_ISO + '">' + UPD_HUMAN + '</time>. Not a live feed; check official advisories for current status. <span class="contrib">Contribute: <a href="https://github.com/emilstahl/pitscaler">GitHub</a> · <a href="mailto:emil@pitscaler.com">emil@pitscaler.com</a> · Signal <code>emil.112</code></span></div>\n' +
       '<header class="site-head"><nav aria-label="Sections" class="wrap nav"><a class="brand" href="/"><img src="/logo.svg" alt="" width="28" height="28"> PitScaler</a><ul>' +
       NAV.map(n => '<li><a href="' + n[0] + '"' + (n[0] === path ? ' aria-current="page"' : '') + '>' + n[1] + '</a></li>' + (n[0] === '/' ? cveMenu(path) : '')).join('') + '</ul></nav></header>\n' +
       '<main id="main">\n<section class="wrap hero"><nav aria-label="Breadcrumb" class="toc"><a href="/">PitScaler</a> › ' + esc(crumb) + '</nav><h1>' + esc(h1) + '</h1></section>\n' +
@@ -191,13 +202,13 @@ export function build(indexHtml, appJs, css, icon) {
     'About PitScaler and its methodology', 'About',
     '<section class="wrap"><p>PitScaler is an independent, non-commercial technical briefing on the September 2026 Citrix NetScaler ADC and Gateway zero-day incident (CVE-2026-88771, CVE-2026-88772 and the six other CVEs in bulletin CTX697096). It is maintained by an independent security practitioner. It is not affiliated with, endorsed by or sponsored by Cloud Software Group, Citrix or NetScaler.</p>' +
     '<h2>Quick answers</h2>' +
-    '<h3>Who maintains PitScaler?</h3><p>An independent security practitioner, writing as the PitScaler editorial identity. Contact and corrections: <a href="mailto:emil@pitscaler.com">emil@pitscaler.com</a>.</p>' +
+    '<h3>Who maintains PitScaler?</h3><p>An independent security practitioner, writing as the PitScaler editorial identity. Contact and corrections: <a href="mailto:emil@pitscaler.com">emil@pitscaler.com</a>. Germany\'s BSI links to PitScaler in its TLP:CLEAR warning BITS-H 2026-289305-1132 (1 October 2026) and recommends that operators use its IoC list. PitScaler is not affiliated with BSI.</p>' +
     '<h3>Is PitScaler affiliated with Citrix?</h3><p>No. It is not affiliated with, endorsed by or sponsored by Cloud Software Group, Citrix or NetScaler. For official guidance, use Citrix bulletin CTX697096.</p>' +
     '<h3>What kind of source is PitScaler?</h3><p>A secondary, independent compilation. It does not produce original telemetry or incident-response findings; every fact is attributed to the primary source that published it.</p>' +
     '<h3>How are claims verified?</h3><p>Each source page is read before it is cited, and quotes are checked word for word. Where a claim rests on one researcher, a press report or a community post, it is labelled as reported and not independently verified.</p>' +
     '<h3>What counts as independently verified?</h3><p>A claim marked "Validated" has been confirmed by a second, independent check, for example against the CVE record, the CISA KEV feed, a primary advisory or a first-hand observation. Claims confirmed only through non-public sources say so, and those sources are not named.</p>' +
     '<h3>How are corrections handled?</h3><p>Corrections sent to emil@pitscaler.com are checked against the primary source and fixed in the next update. The page date changes only when the content changes.</p>' +
-    '<h3>When was this last verified?</h3><p>The whole site is a snapshot as of 1 October 2026. Individual timeline entries marked "Validated" carry their own check date.</p>' +
+    '<h3>When was this last verified?</h3><p>The whole site was last updated ' + UPD_HUMAN + '. Individual timeline entries marked "Validated" carry their own check date.</p>' +
     '<h2>Methodology</h2><p>Every statement is tied to a numbered reference. Sources are classified as:</p><ol><li><strong>Official</strong>: the vendor bulletin and government or national CERT advisories. These take precedence.</li><li><strong>Research</strong>: technical analysis and first-hand incident response by named security firms.</li><li><strong>Telemetry</strong>: sensor and honeypot data (for example GreyNoise, Lupovis, Defused).</li><li><strong>Reported</strong>: claims by individual researchers, community posts and press. These are attributed by name and labelled as not independently verified unless corroborated.</li></ol>' +
     '<p>Where a claim has been checked against a second source, it is marked <em>Validated</em>. Exposure counts are never presented as victim counts.</p>' +
     '<h2>IoC policy</h2><p>Only indicators that have been published openly (TLP:CLEAR or public pages without a TLP marking) are listed, each with its source, sharing marking and a caveat. Indicators received under restricted TLP are not published unless the same value later appears in a public source, which is then cited. IoCs are hunting leads, not universal indicators for every victim.</p>' +
@@ -231,14 +242,14 @@ export function build(indexHtml, appJs, css, icon) {
     .replace(/<div class="cve-head">([\s\S]*?)<\/div>/g, (m, t) => hold('### ' + inline(blockText(t)).replace(/@@(\d+)@@/g, (x, i) => keep[+i].replace(/^#+ /, ''))));
   md = dec(md.replace(/<[^>]+>/g, ' ')).split('\n').map(l => l.trim()).join('\n').replace(/\n{3,}/g, '\n\n').trim();
   md = md.replace(/@@(\d+)@@/g, (m, i) => keep[+i]).replace(/\]\(#ref-(\d+)\)/g, (m, n) => '](' + D.SOURCES[REF_ORDER[n - 1]].url + ')').replace(/(^|\n)(- [^\n]*)\n\n(?=- )/g, '$1$2\n').replace(/\n{3,}/g, '\n\n');
-  const header = '---\ntitle: PitScaler - Citrix NetScaler Zero-Day Crisis\nurl: https://pitscaler.com/\nas_of: 2026-10-01 morning CEST (historical snapshot)\nnote: Independent briefing, not affiliated with Citrix. Check official advisories for current status.\n---\n\n';
+  const header = '---\ntitle: PitScaler - Citrix NetScaler Zero-Day Crisis\nurl: https://pitscaler.com/\nlast_updated: ' + UPD_ISO + ' (historical snapshot)\nnote: Independent briefing, not affiliated with Citrix. Check official advisories for current status.\n---\n\n';
   const foot = st.slice(st.indexOf('<footer'), st.indexOf('</footer>'));
   const footMd = [...foot.matchAll(/<p>([\s\S]*?)<\/p>/g)].map(x => inline(x[1])).join('\n\n');
   md = header + md + '\n\n---\n\n' + footMd + '\n';
 
   const llms = [
     '# PitScaler - Citrix NetScaler zero-days', '',
-    '> Independent, source-linked historical briefing on Citrix NetScaler ADC/Gateway CVE-2026-88771 and CVE-2026-88772. Bulletin CTX697096 lists eight CVEs. Snapshot: 1 October 2026, morning CEST. Not a live feed and not affiliated with Citrix. Verify current status with official advisories.', '',
+    '> Independent, source-linked historical briefing on Citrix NetScaler ADC/Gateway CVE-2026-88771 and CVE-2026-88772. Bulletin CTX697096 lists eight CVEs. Last updated: ' + UPD_HUMAN + '. Not a live feed and not affiliated with Citrix. Verify current status with official advisories.', '',
     'Cite this page as a dated snapshot, not a current incident feed. Distinguish confirmed exploitation from researcher claims and exposure counts from compromised-system counts. All displayed IoCs are from public sources; do not infer that they identify every victim. Patching does not undo an existing compromise.', '',
     '## Briefing formats', '',
     '- [Canonical briefing](https://pitscaler.com/): overview, CVEs, timeline, public IoCs, detection, remediation, FAQs and source links',
@@ -267,7 +278,7 @@ export function build(indexHtml, appJs, css, icon) {
   return {
     ...out,
     '/iocs.csv': [csv, 'text/csv; charset=utf-8'], '/favicon.svg': [favicon, 'image/svg+xml'], '/favicon.ico': [favicon, 'image/svg+xml'], '/logo.svg': [favicon, 'image/svg+xml'],
-    ['/' + INDEXNOW_KEY + '.txt']: [INDEXNOW_KEY, 'text/plain; charset=utf-8'],
+    ...(INDEXNOW_KEY ? { ['/' + INDEXNOW_KEY + '.txt']: [INDEXNOW_KEY, 'text/plain; charset=utf-8'] } : {}),
     '/': [pre, 'text/html; charset=utf-8'], '/style.css': [css, 'text/css; charset=utf-8'], '/app.js': [appJs, 'text/javascript; charset=utf-8'],
     '/static.html': [st, 'text/html; charset=utf-8'], '/index.md': [md, 'text/markdown; charset=utf-8'], '/llms-full.txt': [md, 'text/plain; charset=utf-8'],
     '/llms.txt': [llms, 'text/plain; charset=utf-8'], '/robots.txt': [robots, 'text/plain; charset=utf-8'], '/.well-known/security.txt': ['Contact: mailto:emil@pitscaler.com\nExpires: 2027-09-30T00:00:00Z\nPreferred-Languages: en, da\nCanonical: https://pitscaler.com/.well-known/security.txt\n', 'text/plain; charset=utf-8'], '/sitemap.xml': [sitemap, 'application/xml; charset=utf-8']
@@ -325,7 +336,7 @@ export default {
     const extra = Object.assign({}, vary);
     if (f[1].startsWith('text/markdown')) extra['x-markdown-tokens'] = String(Math.ceil(f[0].length / 4));
     if (['/index.md', '/llms.txt', '/llms-full.txt'].includes(path)) extra.link = '<https://pitscaler.com/>; rel="canonical"';
-    if (path === '/iocs.csv') extra['content-disposition'] = 'attachment; filename="pitscaler-iocs-2026-09-30.csv"';
+    if (path === '/iocs.csv') extra['content-disposition'] = 'attachment; filename="pitscaler-iocs.csv"';
     return new Response(req.method === 'HEAD' ? null : f[0], { headers: hdr(f[1], extra) });
   }
 };
@@ -333,7 +344,10 @@ export default {
 
 if (import.meta.url === 'file://' + process.argv[1]) {
   const P = 'public/';
-  const files = build(readFileSync(P + 'index.html', 'utf8'), readFileSync(P + 'app.js', 'utf8'), readFileSync(P + 'style.css', 'utf8'), readFileSync('logo.svg', 'utf8'));
+  // latest commit touching the site content (not README/workflows); falls back to the latest commit, then a fixed date
+  const git = (args) => { try { return execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch { return ''; } };
+  const updatedIso = git(['log', '-1', '--format=%cI', '--', 'public', 'build.mjs', 'logo.svg']) || git(['log', '-1', '--format=%cI']) || '2026-10-01T00:00:00Z';
+  const files = build(readFileSync(P + 'index.html', 'utf8'), readFileSync(P + 'app.js', 'utf8'), readFileSync(P + 'style.css', 'utf8'), readFileSync('logo.svg', 'utf8'), updatedIso);
   // generated copies go to dist/ so public/ stays the editable source
   mkdirSync('dist', { recursive: true });
   for (const [path, [body]] of Object.entries(files)) {

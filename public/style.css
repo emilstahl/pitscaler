@@ -148,15 +148,15 @@ sup.ref a:hover { text-decoration: underline; }
 .refs td:first-child { font-family: var(--mono); color: var(--muted); text-align: right; white-space: nowrap; }
 .refs td.url code { background: transparent; padding: 0; font-size: .8rem; color: var(--muted); word-break: break-all; }
 .refs tr:target, .refs tr:target td { background: #2a2210; }
-.facts { display: grid; grid-template-columns: max-content 1fr; gap: .3rem 1rem; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.25rem; margin: 1rem 0; }
-.facts dt { color: var(--muted); }
-.facts dd { margin: 0; }
-@media (max-width: 36rem) { .facts { grid-template-columns: 1fr; } .facts dd { margin-bottom: .4rem; } }
+dl.facts { display: grid; grid-template-columns: max-content 1fr; gap: .3rem 1rem; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.25rem; margin: 1rem 0; }
+dl.facts dt { color: var(--muted); }
+dl.facts dd { margin: 0; }
+@media (max-width: 36rem) { dl.facts { grid-template-columns: 1fr; } dl.facts dd { margin-bottom: .4rem; } }
 .related { columns: 2; column-gap: 2rem; }
 @media (max-width: 36rem) { .related { columns: 1; } }
 .cve-head h3 a { color: inherit; }
 .nav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
-.facts { margin: 1.25rem 0 0; }
+table.facts { margin: 0; }
 .facts caption { text-align: left; padding: .6rem .8rem; color: var(--muted); font-size: .85rem; caption-side: top; }
 .facts th { width: 11rem; color: var(--muted); font-weight: 600; white-space: normal; background: transparent; }
 li.dd { position: relative; }
