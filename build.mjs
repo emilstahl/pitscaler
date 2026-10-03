@@ -280,13 +280,13 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
 
   // Firewall-edge blocklist: only IPv4 rows whose own caveat does not warn against blocking
   // (Cloudflare WARP egress, shared VPN exits, residential/ISP CGNAT, domain-parking IPs are excluded).
-  const blockable = D.IOCS.filter(r => r.type === 'IPv4' && !/do not block on it|never block|cloudflare warp/i.test(r.caveat) && !/cloudflare warp|cloudflare, inc/i.test(r.context) && !/shared by many users|likely a commercial vpn/i.test(r.caveat) && !/sedo domain-parking/i.test(r.caveat));
+  const blockable = D.IOCS.filter(r => r.type === 'IPv4' && !r.exclude_blocklist && !/do not block on it|never block|cloudflare warp/i.test(r.caveat) && !/cloudflare warp|cloudflare, inc/i.test(r.context) && !/shared by many users|likely a commercial vpn/i.test(r.caveat) && !/sedo domain-parking/i.test(r.caveat));
   const blockedExcluded = D.IOCS.filter(r => r.type === 'IPv4' && !blockable.includes(r));
   const gen = new Date().toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
   const blHeader = [
     '# PitScaler CVE-2026-88771/88772 public-IoC IPv4 edge-blocklist',
     '# Generated ' + gen + ' from https://pitscaler.com/iocs.csv',
-    '# ' + blockable.length + ' IPs included; ' + blockedExcluded.length + ' IPv4 rows excluded as shared infrastructure',
+    '# ' + blockable.length + ' IPs included; ' + blockedExcluded.length + ' IPv4 rows excluded as shared infrastructure or low-confidence leads',
     '#   (Cloudflare WARP egress, shared commercial VPN exits, residential/ISP CGNAT addresses, a domain-parking IP).',
     '# Read the caveats: https://pitscaler.com/iocs.csv - attacker IPs differ per victim (Beaumont).',
     '# Blocking these is defence in depth, not incident response. A clean log proves nothing.',
