@@ -183,7 +183,12 @@
     </div>
     <p class="export"><a class="button" href="/iocs.csv" download>Download all IoCs as CSV</a> <a class="button" href="/blocklist.txt" download>Firewall blocklist (93 IPs, annotated)</a> <a class="button" href="/blocklist-plain.txt" download>Plain IP list</a></p>
     <p class="note">The blocklist contains only the IPv4 indicators whose own source data does not warn against blocking. It excludes Cloudflare WARP egress, shared commercial VPN exits, residential/ISP (CGNAT) addresses and a domain-parking IP — those are in the CSV with their caveats. IPs differ per victim; a blocklist is defence in depth, not a substitute for patching and compromise checks.</p>
-    <label class="search" for="ioc-q">Filter indicators <input id="ioc-q" type="search" autocomplete="off" placeholder="e.g. sha256, receiver, 149.104"></label>
+    <div class="ioc-tools">
+      <label class="search" for="ioc-q">Filter indicators <input id="ioc-q" type="search" autocomplete="off" placeholder="e.g. sha256, receiver, 149.104"></label>
+      <label class="search" for="ioc-type">Type
+        <select id="ioc-type"><option value="">All types</option></select>
+      </label>
+    </div>
     <div class="table-wrap" tabindex="0" role="region" aria-label="IoC table, scrollable">
       <table class="ioc">
         <caption class="sr-only">Publicly released indicators for NetScaler CVE-2026-88771 and CVE-2026-88772 exploitation</caption>

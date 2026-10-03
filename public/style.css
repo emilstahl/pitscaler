@@ -113,6 +113,9 @@ q { quotes: "\201C" "\201D"; font-style: italic; }
 .timeline details a { overflow-wrap: anywhere; }
 
 .search { display: flex; flex-direction: column; gap: .35rem; max-width: 28rem; margin: 1rem 0; font-size: .9rem; color: var(--muted); }
+.ioc-tools { display: flex; flex-wrap: wrap; gap: 0 1.5rem; align-items: flex-start; }
+.ioc-tools .search { flex: 1 1 16rem; }
+.search select { font: inherit; font-size: 1rem; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: .55rem .75rem; max-width: 100%; }
 .search input { font: inherit; font-size: 1rem; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: .55rem .75rem; }
 .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
 table { border-collapse: collapse; width: 100%; font-size: .92rem; }

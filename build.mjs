@@ -100,13 +100,13 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
   pre = pre.replace('<!--JSONLD-->', '<script type="application/ld+json">' + JSON.stringify(ld).replace(/</g, '\\u003c') + '</script>');
   let st = pre.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, '').replace(/<p class="export">[\s\S]*?<\/p>/, '<p class="export"><a class="button" href="/iocs.csv">Download all IoCs as CSV</a></p>');
   st = st.replace(/<div class="filters"[\s\S]*?<\/div>\s*<p id="tl-count"[^>]*><\/p>/, '')
-         .replace(/<label class="search"[\s\S]*?<\/label>/, '').replace(/<p id="ioc-count"[^>]*><\/p>/, '')
+         .replace(/<div class="ioc-tools"[\s\S]*?<\/div>\s*/, '').replace(/<p id="ioc-count"[^>]*><\/p>/, '')
          .replace(/<noscript>[\s\S]*?<\/noscript>\s*/, '').replace(/<script[^>]*><\/script>\s*/, '')
          .replace('<div class="banner" role="note">', '<div class="banner" role="note"><strong>Static version</strong> without JavaScript. <a href="/">Interactive version</a> · <a href="/index.md">Markdown</a>. ');
 
 
   // ---- Dedicated pages: one canonical URL per search intent, generated from the same data ----
-  const sectionInner = id => { const m = pre.match(new RegExp('<section id="' + id + '"[^>]*>([\\s\\S]*?)<\\/section>')); return m ? m[1].replace(/<h2[^>]*>[\s\S]*?<\/h2>/, '').replace(/<label class="search"[\s\S]*?<\/label>/, '').replace(/<p id="ioc-count"[^>]*><\/p>/, '') : ''; };
+  const sectionInner = id => { const m = pre.match(new RegExp('<section id="' + id + '"[^>]*>([\\s\\S]*?)<\\/section>')); return m ? m[1].replace(/<h2[^>]*>[\s\S]*?<\/h2>/, '').replace(/<div class="ioc-tools"[\s\S]*?<\/div>\s*/, '').replace(/<p id="ioc-count"[^>]*><\/p>/, '') : ''; };
   const cveCards = cveHtml.split('\n');
   const tlLines = tlHtml.split('\n');
   const SHORT = { 'CVE-2026-88771': 'unauthenticated remote code execution', 'CVE-2026-88772': 'DTLS memory overflow leading to RCE', 'CVE-2026-88773': 'HTTP request smuggling',

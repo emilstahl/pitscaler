@@ -860,7 +860,30 @@ function fmtDate(iso) {
   var body = document.getElementById('ioc-body');
   body.replaceChildren();
   var q = document.getElementById('ioc-q');
+  var typeSel = document.getElementById('ioc-type');
   var count = document.getElementById('ioc-count');
+  var groupNames = { 'Filename': 'Filename', 'File name': 'Filename', 'Filename pattern': 'Filename', 'File path': 'Filename',
+    'SHA-256': 'Hash', 'TLS cert SHA-256': 'Hash',
+    'URL': 'URL', 'URI path': 'URL', 'URL alias': 'URL',
+    'IPv4': 'Network', 'Network': 'Network', 'Domain': 'Network', 'DNS pattern': 'Network', 'Network fingerprint': 'Network', 'GreyNoise tag': 'Network',
+    'HTTP header': 'HTTP', 'HTTP request': 'HTTP', 'HTTP request pattern': 'HTTP', 'HTTP cookie': 'HTTP', 'Cookie value': 'HTTP', 'User-Agent': 'HTTP',
+    'Log string': 'Logs', 'Log pattern': 'Logs', 'NetScaler log line': 'Logs', 'Cron entry': 'Logs',
+    'Config directive': 'Config', 'Config pattern': 'Config', 'Apache directive': 'Config', 'AliasMatch regex': 'Config', 'File permission': 'Config',
+    'Command': 'Config', 'String': 'Other', 'Username': 'Other', 'Account': 'Other', 'RC4 key': 'Other', 'Signing key': 'Other', 'Build fingerprint': 'Other', 'Cert URI SAN': 'Other' };
+  var groups = {};
+  Object.keys(groupNames).forEach(function (t) { if (IOCS.some(function (r) { return r.type === t; })) groups[t] = groupNames[t]; });
+  IOCS.forEach(function (r) { if (!groupNames[r.type]) groups[r.type] = 'Other'; });
+  var gNames = {};
+  IOCS.forEach(function (r) { gNames[r.type] = groups[r.type]; });
+  var gOrder = ['Network', 'Hash', 'Filename', 'URL', 'HTTP', 'Logs', 'Config', 'Other'];
+  var gLabels = { 'Network': 'Network (IP, domain, DNS)', 'Hash': 'Hashes', 'Filename': 'Files and paths', 'URL': 'URLs and paths', 'HTTP': 'HTTP (headers, cookies, user agents)', 'Logs': 'Log entries', 'Config': 'Config and commands', 'Other': 'Other' };
+  gOrder.forEach(function (g) {
+    var types = Object.keys(gNames).filter(function (t) { return gNames[t] === g; }).sort();
+    if (!types.length) return;
+    var og = document.createElement('optgroup'); og.label = gLabels[g] || g;
+    types.forEach(function (t) { var o = document.createElement('option'); o.value = t; o.textContent = t + ' (' + IOCS.filter(function (r) { return r.type === t; }).length + ')'; og.appendChild(o); });
+    typeSel.appendChild(og);
+  });
   IOCS.forEach(function (r) {
     var btn = h('button', { type: 'button', cls: 'copy', 'aria-label': 'Copy ' + r.type + ' value', text: 'Copy' });
     btn.addEventListener('click', function () {
@@ -884,17 +907,19 @@ function fmtDate(iso) {
       h('td', { text: r.share })
     ]);
     tr.setAttribute('data-search', (r.type + ' ' + r.value + ' ' + r.context).toLowerCase());
+    tr.setAttribute('data-type', r.type);
     body.appendChild(tr);
   });
   function filter() {
-    var t = q.value.trim().toLowerCase(), n = 0;
+    var t = q.value.trim().toLowerCase(), sel = typeSel.value, n = 0;
     Array.prototype.forEach.call(body.children, function (tr) {
-      var show = !t || tr.getAttribute('data-search').indexOf(t) !== -1;
+      var show = (!t || tr.getAttribute('data-search').indexOf(t) !== -1) && (!sel || tr.getAttribute('data-type') === sel);
       tr.hidden = !show; if (show) n++;
     });
     count.textContent = n + ' of ' + IOCS.length + ' indicators shown. No match in this table does not mean a host is clean.';
   }
   q.addEventListener('input', filter);
+  typeSel.addEventListener('change', filter);
   filter();
 })();
 
