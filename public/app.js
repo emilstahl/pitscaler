@@ -870,7 +870,7 @@ function fmtDate(iso) {
   var list = document.getElementById('tl-list');
   list.replaceChildren();
   var count = document.getElementById('tl-count');
-  var LABEL = { official: 'Official advisory', research: 'Research', telemetry: 'Telemetry', reported: 'Reported observation', community: 'Community' };
+  var LABEL = { official: 'Official advisory', research: 'Research', telemetry: 'Telemetry', reported: 'Reported observation', community: 'Community', press: 'Press', beaumont: 'Beaumont' };
   TIMELINE.forEach(function (e, i) {
     var dateTxt = (e.approx ? '~' : '') + fmtDate(e.date) + (e.time ? ', ' + e.time + ' UTC' : '');
     var tags = [h('span', { cls: 'tag tag-' + e.kind, text: LABEL[e.kind] })];

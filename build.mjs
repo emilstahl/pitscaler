@@ -40,7 +40,7 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
   const cites = ids => ' <sup class="ref">' + ids.map(refA).join('') + '</sup>';
   const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const fmt = iso => { const p = iso.split('-'); return MON[+p[1] - 1] + ' ' + (+p[2]); };
-  const LABEL = { official: 'Official advisory', research: 'Research', telemetry: 'Telemetry', reported: 'Reported observation' };
+  const LABEL = { official: 'Official advisory', research: 'Research', telemetry: 'Telemetry', reported: 'Reported observation', community: 'Community', press: 'Press', beaumont: 'Beaumont' };
 
   const slug = e => 'tl-' + e.date + '-' + e.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48).replace(/-$/, '');
   const cveHtml = D.CVES.map(c => '<article id="' + c.id.toLowerCase() + '" class="cve ' + c.kind + '"><div class="cve-head"><h3><a href="/' + c.id.toLowerCase() + '/">' + esc(c.id) + '</a></h3> <span class="tag ' +
@@ -149,21 +149,23 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
     'CVE-2026-88775': { euvd: 'EUVD-2026-87962', cwe: 'CWE-120 (Citrix: CWE-119)', nvd: 'Modified', pub: '2026-09-27 16:21', vec: 'CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:H/SC:N/SI:N/SA:N' },
     'CVE-2026-88776': { euvd: 'EUVD-2026-87971', cwe: 'CWE-119', nvd: 'Modified', pub: '2026-09-27 16:36', vec: 'CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:H/SC:N/SI:N/SA:N' },
     'CVE-2026-88777': { euvd: 'EUVD-2026-87972', cwe: 'CWE-119', nvd: 'Modified', pub: '2026-09-27 16:37', vec: 'CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:H/SC:N/SI:N/SA:N' },
-    'CVE-2026-88778': { euvd: 'EUVD-2026-87973', cwe: 'CWE-342', nvd: 'Analyzed', pub: '2026-09-27 16:43', vec: 'CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:H/VA:H/SC:L/SI:L/SA:L' }
+    'CVE-2026-88778': { euvd: 'EUVD-2026-87973', cwe: 'CWE-342', nvd: 'Analyzed', pub: '2026-09-27 16:43', vec: 'CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:H/VA:H/SC:L/SI:L/SA:L' },
+    'CVE-2026-88779': { euvd: '', cwe: 'CWE-119', nvd: 'Undergoing Analysis (CNA score carried: CVSS 4.0 8.7 HIGH, Secondary)', pub: '2026-10-04 04:16', vec: 'CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N' }
   };
   const recordsHtml = c => { const r = REC[c.id]; if (!r) return ''; const k = KEV[c.id];
+    const is88779 = c.id === 'CVE-2026-88779';
     return '<section class="wrap"><h2>' + esc(c.id) + ' vulnerability records</h2>' +
-      '<p>Official records for ' + esc(c.id) + ', checked on 30 September 2026. The CVE record was published by the CNA (NetScaler) at ' + r.pub + ' UTC.</p>' +
+      '<p>Official records for ' + esc(c.id) + ', checked on ' + (is88779 ? '5 October 2026' : '30 September 2026') + '. The CVE record was published by the CNA (NetScaler) at ' + r.pub + ' UTC' + (is88779 ? '; NVD lists it as Undergoing Analysis, carrying the CNA-provided CVSS 4.0 8.7 HIGH (Secondary) and CWE-119. NVD has not scored it independently yet' : '') + '.</p>' +
       '<div class="table-wrap" role="region" aria-label="Vulnerability records"><table class="facts"><tbody>' +
       '<tr><th scope="row">CVSS 4.0 vector</th><td><code>' + r.vec + '</code></td></tr>' +
       '<tr><th scope="row">Weakness (NVD)</th><td>' + esc(r.cwe) + '</td></tr>' +
-      '<tr><th scope="row">NVD status</th><td>' + r.nvd + '</td></tr>' +
-      '<tr><th scope="row">EUVD ID</th><td>' + r.euvd + '</td></tr>' +
+      '<tr><th scope="row">NVD status</th><td>' + esc(r.nvd) + '</td></tr>' +
+      (r.euvd ? '<tr><th scope="row">EUVD ID</th><td>' + r.euvd + '</td></tr>' : '') +
       '</tbody></table></div><ul class="records">' +
       '<li><a href="https://nvd.nist.gov/vuln/detail/' + c.id + '">NIST NVD: ' + c.id + '</a></li>' +
       '<li><a href="https://www.cve.org/CVERecord?id=' + c.id + '">CVE.org record: ' + c.id + '</a></li>' +
-      '<li><a href="https://euvd.enisa.europa.eu/vulnerability/' + r.euvd + '">ENISA EU Vulnerability Database: ' + r.euvd + '</a></li>' +
-      '<li><a href="https://support.citrix.com/external/article/CTX697096/citrix-netscaler-adc-and-citrix-netscale.html">Citrix bulletin CTX697096</a></li>' +
+      (r.euvd ? '<li><a href="https://euvd.enisa.europa.eu/vulnerability/' + r.euvd + '">ENISA EU Vulnerability Database: ' + r.euvd + '</a></li>' : '') +
+      '<li><a href="https://support.citrix.com/external/article/' + (is88779 ? 'CTX697174' : 'CTX697096') + '/citrix-netscaler-adc-and-citrix-netscale.html">Citrix bulletin ' + (is88779 ? 'CTX697174' : 'CTX697096') + '</a></li>' +
       (k ? '<li><a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog?search_api_fulltext=' + c.id + '">CISA KEV entry: ' + c.id + '</a></li>' : '') +
       '</ul></section>'; };
   D.CVES.forEach((c, i) => {
