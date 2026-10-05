@@ -66,6 +66,7 @@ h1 { font-size: clamp(1.8rem, 5vw, 2.8rem); margin: 0 0 1rem; }
 .tag-research { color: var(--link); }
 .tag-telemetry { color: var(--violet); }
 .tag-reported { color: var(--amber); }
+.tag-community { color: #7fb3ff; }
 .tag-danger { color: var(--red); }
 .tag-deadline { color: var(--red); }
 .pending { color: #1c1300; background: var(--amber); font-size: .75rem; font-weight: 700; padding: .05rem .45rem; border-radius: 4px; white-space: nowrap; }

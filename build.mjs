@@ -22,7 +22,7 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
   indexHtml = tok(indexHtml); appJs = tok(appJs);
   const dataSrc = appJs.slice(0, appJs.indexOf('/* ================= Rendering'));
   const D = new Function(dataSrc + '\nreturn { SOURCES, SOURCE_CATS, CVES, TIMELINE, IOCS, BUILDS, FAQ };')();
-  const cveMenu = here => '<li class="dd"><details><summary>CVEs</summary><ul>' + (here === '#home' ? '<li><a href="#cves">All eight CVEs</a></li>' : '') + D.CVES.map(c => { const p = '/' + c.id.toLowerCase() + '/';
+  const cveMenu = here => '<li class="dd"><details><summary>CVEs</summary><ul>' + (here === '#home' ? '<li><a href="#cves">All CVEs</a></li>' : '') + D.CVES.map(c => { const p = '/' + c.id.toLowerCase() + '/';
     return '<li><a href="' + p + '"' + (p === here ? ' aria-current="page"' : '') + '>' + c.id + '</a></li>'; }).join('') + '</ul></details></li>';
   const FOOTNAV = '<nav aria-label="All pages" class="footnav"><div><h2>CVE pages</h2><ul>' +
     D.CVES.map(c => '<li><a href="/' + c.id.toLowerCase() + '/">' + c.id + '</a></li>').join('') + '</ul></div><div><h2>Guides</h2><ul>' +
@@ -87,7 +87,7 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
     { '@type': 'Organization', '@id': 'https://pitscaler.com/#publisher', name: 'PitScaler', url: 'https://pitscaler.com/', email: 'emil@pitscaler.com', logo: 'https://pitscaler.com/logo.svg' },
     { '@type': 'TechArticle', '@id': 'https://pitscaler.com/#briefing', mainEntityOfPage: { '@type': 'WebPage', '@id': 'https://pitscaler.com/' }, url: 'https://pitscaler.com/',
       headline: 'Citrix NetScaler zero-day vulnerabilities CVE-2026-88771 and CVE-2026-88772',
-      description: 'Source-linked historical briefing on the two exploited NetScaler zero-days, all eight CVEs in CTX697096, timeline, public IoCs, detection and remediation. Last updated: ' + UPD_HUMAN + '.',
+      description: 'Source-linked historical briefing on the exploited NetScaler zero-days CVE-2026-88771, CVE-2026-88772 and CVE-2026-88779, all CVEs in CTX697096 and CTX697174, timeline, public IoCs, detection and remediation. Last updated: ' + UPD_HUMAN + '.',
       inLanguage: 'en', isAccessibleForFree: true, datePublished: PUBLISHED, dateModified: MOD,
       author: { '@id': 'https://pitscaler.com/#publisher' }, publisher: { '@id': 'https://pitscaler.com/#publisher' }, isPartOf: { '@id': 'https://pitscaler.com/#website' },
       about: [{ '@type': 'Thing', name: 'Citrix NetScaler ADC and Gateway' }].concat(D.CVES.slice(0, 2).map(c => ({ '@type': 'Thing', name: c.id, sameAs: 'https://www.cve.org/CVERecord?id=' + c.id }))),
@@ -111,8 +111,8 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
   const tlLines = tlHtml.split('\n');
   const SHORT = { 'CVE-2026-88771': 'unauthenticated remote code execution', 'CVE-2026-88772': 'DTLS memory overflow leading to RCE', 'CVE-2026-88773': 'HTTP request smuggling',
     'CVE-2026-88774': 'feature policy bypass', 'CVE-2026-88775': 'Gateway/AAA memory overflow (DoS)', 'CVE-2026-88776': 'Oracle load-balancer memory overflow (DoS)',
-    'CVE-2026-88777': 'non-HTTP L7 memory overflow (DoS)', 'CVE-2026-88778': 'TCP initial sequence number prediction' };
-  const KEV = { 'CVE-2026-88771': true, 'CVE-2026-88772': true };
+    'CVE-2026-88777': 'non-HTTP L7 memory overflow (DoS)', 'CVE-2026-88778': 'TCP initial sequence number prediction', 'CVE-2026-88779': 'SAML memory overflow leading to DoS' };
+  const KEV = { 'CVE-2026-88771': true, 'CVE-2026-88772': true, 'CVE-2026-88779': true };
   const NAV = [['/', 'Overview'], ['/netscaler-timeline/', 'Timeline'], ['/netscaler-iocs/', 'IoCs'], ['/netscaler-detection/', 'Detection'], ['/netscaler-remediation/', 'Remediation'], ['/faq/', 'FAQ'], ['/about/', 'About']];
   const refsBlock = '<section id="sources" class="wrap" aria-labelledby="h-sources"><h2 id="h-sources">References</h2><div class="table-wrap" tabindex="0" role="region" aria-label="References table, scrollable"><table class="refs"><thead><tr><th scope="col">#</th><th scope="col">Source</th><th scope="col">Type</th><th scope="col">URL</th></tr></thead><tbody>' + srcHtml + '</tbody></table></div></section>';
   const pages = [];
@@ -168,11 +168,12 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
       '</ul></section>'; };
   D.CVES.forEach((c, i) => {
     const kev = KEV[c.id];
-    const facts = '<dl class="facts"><dt>CVE</dt><dd>' + c.id + '</dd><dt>Product</dt><dd>Citrix NetScaler ADC and NetScaler Gateway</dd><dt>Bulletin</dt><dd>CTX697096' + cites(['citrix']) + '</dd>' +
-      '<dt>Severity</dt><dd>' + esc(c.score) + '</dd><dt>Exploitation</dt><dd>' + esc(c.status) + '</dd><dt>CISA KEV</dt><dd>' + (kev ? 'Yes, added 27 Sep 2026, federal deadline 30 Sep 2026' + cites(['kev']) : 'No') + '</dd>' +
-      '<dt>Disclosed</dt><dd><time datetime="2026-09-27">27 Sep 2026</time></dd><dt>Fixed builds</dt><dd><a href="/netscaler-remediation/">14.1-73.37, 13.1-64.23 and FIPS/NDcPP builds</a></dd></dl>';
+    const is88779 = c.id === 'CVE-2026-88779';
+    const facts = '<dl class="facts"><dt>CVE</dt><dd>' + c.id + '</dd><dt>Product</dt><dd>Citrix NetScaler ADC and NetScaler Gateway</dd><dt>Bulletin</dt><dd>' + (is88779 ? 'CTX697174' + cites(['citrix88779']) : 'CTX697096' + cites(['citrix'])) + '</dd>' +
+      '<dt>Severity</dt><dd>' + esc(c.score) + '</dd><dt>Exploitation</dt><dd>' + esc(c.status) + '</dd><dt>CISA KEV</dt><dd>' + (kev ? (is88779 ? 'Yes, added 4 Oct 2026, federal deadline 7 Oct 2026' : 'Yes, added 27 Sep 2026, federal deadline 30 Sep 2026') + cites(['kev']) : 'No') + '</dd>' +
+      '<dt>Disclosed</dt><dd>' + (is88779 ? '<time datetime="2026-10-03">3 Oct 2026</time>' : '<time datetime="2026-09-27">27 Sep 2026</time>') + '</dd><dt>Fixed builds</dt><dd><a href="/netscaler-remediation/">' + (is88779 ? '14.1-73.41, 13.1-64.28 and FIPS/NDcPP builds' : '14.1-73.37, 13.1-64.23 and FIPS/NDcPP builds') + '</a></dd></dl>';
     const lede = '<p>' + esc(c.id) + ' is a Citrix NetScaler ADC and Gateway vulnerability: ' + esc(SHORT[c.id]) + ', rated ' + esc(c.score.replace('CVSS 4.0: ', 'CVSS 4.0 ')) + '. ' +
-      (kev ? 'It was exploited in the wild as a zero-day before Citrix disclosed it on 27 September 2026.' : c.kind === 'chain' ? 'Kevin Beaumont reports it was chained with CVE-2026-88771 and CVE-2026-88772 in the attacks. As of 1 October 2026 no other source has independently confirmed its exploitation.' : 'No exploitation has been reported as of ' + UPD_DAY + '.') + cites(kev ? ['citrix', 'cisa'] : c.kind === 'chain' ? ['citrix', 'kb1'] : ['citrix']) + '</p>';
+      (is88779 ? 'Citrix disclosed it on 3 October 2026 in bulletin CTX697174, crediting Bishop Fox and watchTowr, and says it has observed targeted attacks on unmitigated deployments with no impact on customer data integrity so far. It is the CVE behind the SAML issue Citrix had described without a CVE since 2 October.' + cites(['citrix88779']) : kev ? 'It was exploited in the wild as a zero-day before Citrix disclosed it on 27 September 2026.' : c.kind === 'chain' ? 'Kevin Beaumont reports it was chained with CVE-2026-88771 and CVE-2026-88772 in the attacks. As of 1 October 2026 no other source has independently confirmed its exploitation.' : 'No exploitation has been reported as of ' + UPD_DAY + '.') + (is88779 ? '' : cites(kev ? ['citrix', 'cisa'] : c.kind === 'chain' ? ['citrix', 'kb1'] : ['citrix'])) + '</p>';
     const tl = tlLines.filter(l => l.includes(c.id));
     const faq = D.FAQ.filter(f => f.a.includes(c.id) || f.q.includes(c.id)).map(f => '<div class="faq"><h3>' + esc(f.q) + '</h3><p>' + esc(f.a) + cites(f.cite) + '</p></div>').join('');
     const body = '<section class="wrap">' + lede + facts + '<div class="cves">' + cveCards[i] + '</div></section>' + recordsHtml(c) +
@@ -250,7 +251,7 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
 
   const llms = [
     '# PitScaler - Citrix NetScaler zero-days', '',
-    '> Independent, source-linked historical briefing on Citrix NetScaler ADC/Gateway CVE-2026-88771 and CVE-2026-88772. Bulletin CTX697096 lists eight CVEs. Last updated: ' + UPD_HUMAN + '. Not a live feed and not affiliated with Citrix. Verify current status with official advisories.', '',
+    '> Independent, source-linked historical briefing on Citrix NetScaler ADC/Gateway CVE-2026-88771, CVE-2026-88772 and CVE-2026-88779. Bulletins CTX697096 (eight CVEs) and CTX697174. Last updated: ' + UPD_HUMAN + '. Not a live feed and not affiliated with Citrix. Verify current status with official advisories.', '',
     'Cite this page as a dated snapshot, not a current incident feed. Distinguish confirmed exploitation from researcher claims and exposure counts from compromised-system counts. All displayed IoCs are from public sources; do not infer that they identify every victim. Patching does not undo an existing compromise.', '',
     '## Briefing formats', '',
     '- [Canonical briefing](https://pitscaler.com/): overview, CVEs, timeline, public IoCs, detection, remediation, FAQs and source links',
