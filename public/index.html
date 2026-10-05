@@ -63,7 +63,7 @@
       <div><dt>Confirmed exploited zero-days</dt><dd>2</dd><p>CVE-2026-88771, CVE-2026-88772</p></div>
       <div><dt>CVEs in bulletin CTX697096</dt><dd>8</dd><p>CVE-2026-88771 to -88778</p></div>
       <div><dt>Public disclosure</dt><dd><time datetime="2026-09-27T15:51Z">27 Sep 2026</time></dd><p>15:51 UTC, per GreyNoise</p></div>
-      <div><dt>CISA KEV federal deadline</dt><dd><time datetime="2026-09-30">30 Sep 2026</time></dd><p>US time, so it had only just passed at this snapshot</p></div>
+      <div><dt>CISA KEV federal deadline</dt><dd><time datetime="2026-09-30">30 Sep 2026</time></dd><p>KEV lists a date, no time; by CISA's 11:59 PM ET convention it expired 1 Oct 03:59 UTC — passed before this snapshot</p></div>
     </dl>
 
     <aside class="callout callout-alert" aria-label="New: separate SAML issue">
@@ -181,7 +181,7 @@
       <p><strong>Indicators are not proof of compromise by themselves.</strong> Validate any hit against appliance logs, filesystem integrity, process history and configuration changes, following your incident-response procedure.</p>
       <p><strong>How to read these.</strong> Each indicator was observed by the source named in its row. None of them is a universal indicator for every victim. Beaumont reports that webshell names and attacker IPs are unique per victim. <a class="cite" href="https://cyberplace.social/@GossiTheDog/117351107654208046">[Beaumont]</a> <a class="cite" href="https://cyberplace.social/@GossiTheDog/117355208096613386">[Beaumont]</a> An empty search result proves nothing.</p>
     </div>
-    <p class="export"><a class="button" href="/iocs.csv" download>Download all IoCs as CSV</a> <a class="button" href="/blocklist.txt" download>Firewall blocklist (93 IPs, annotated)</a> <a class="button" href="/blocklist-plain.txt" download>Plain IP list</a></p>
+    <p class="export"><a class="button" href="/iocs.csv" download>Download all IoCs as CSV</a> <a class="button" href="/blocklist.txt" download>Firewall blocklist (93 IPs, annotated)</a> <a class="button" href="/blocklist-plain.txt" download>Plain IP list</a> <a class="button" href="/blocklist-domains.txt" download>Domain blocklist (pylrk.cc wildcard, annotated)</a> <a class="button" href="/blocklist-domains-plain.txt" download>Plain domain list</a></p>
     <p class="note">The blocklist contains only the IPv4 indicators whose own source data does not warn against blocking. It excludes Cloudflare WARP egress, shared commercial VPN exits, residential/ISP (CGNAT) addresses and a domain-parking IP — those are in the CSV with their caveats. IPs differ per victim; a blocklist is defence in depth, not a substitute for patching and compromise checks.</p>
     <div class="ioc-tools">
       <label class="search" for="ioc-q">Filter indicators <input id="ioc-q" type="search" autocomplete="off" placeholder="e.g. sha256, receiver, 149.104"></label>
@@ -197,6 +197,16 @@
       </table>
     </div>
     <p id="ioc-count" class="note" aria-live="polite"></p>
+    <h3>The 2 October SAML-issue payload chain: f.pylrk.cc and the FreeBSD Sliver implant</h3>
+    <p>A TLP:CLEAR malware analysis report (2 October, vendor-independent, corroborated by an Expel IR observation) and the delivery host's live state connect the new-issue delivery domain to an actual implant:</p>
+    <ul>
+      <li><code>pylrk.cc</code> was registered on 2 Oct at 06:56 UTC (NameSilo, Cloudflare nameservers); the delivery subdomain <code>f.pylrk.cc</code> first appears in passive DNS at 11:50 UTC with a Let's Encrypt certificate (CN=pylrk.cc) issued at 06:01 UTC.</li>
+      <li><code>f.pylrk.cc/HaKi2ufpiQ8AeVTZ/host</code> served an 8,822,784-byte Go ELF64 binary over HTTPS (HTTP/2 200, application/octet-stream, Cloudflare-fronted). Still live and unchanged on 3 October.</li>
+      <li>The binary is a <strong>Sliver C2 implant compiled for FreeBSD</strong> - the OS under NetScaler - with a hardcoded C2 reference to <code>https://www.pylrk.cc</code>, a custom protocol tag <code>pylrkfbsd</code>, tunnel/reverse-shell capability (<code>IMPLANT_CAPABILITY_TUNNEL_TERMINAL_V1</code>), a spoofed Chrome 108/Windows User-Agent for its own beacons, and no embedded IP (C2 resolves via DNS).</li>
+      <li>VirusTotal: 31 of 75 engines detect it, all Sliver/Vilers-family labels; first submitted 2 Oct 11:49 UTC; recorded filenames include <code>/var/tmp/.host</code> and <code>citrix3.bad</code> - appliance deployment paths.</li>
+      <li>A separate Perl-script payload (3-4 of 75 engines) is associated with <code>213.209.159.55</code>, not with f.pylrk.cc; the two delivery chains are distinct in the public reporting.</li>
+    </ul>
+    <p class="note">The report is a static analysis (sample not executed) by an external team, not a vendor or CERT publication. Cloudflare fronts the delivery host: block the domain names and the hash, never the resolved proxy IPs. Hunt <code>*.pylrk.cc</code> in DNS logs rather than the single hostname - subdomains may rotate. <a class="cite" href="https://www.virustotal.com/gui/file/0188b0eba4b01c4fb838df9d1d76c76d7f1dc22897e25161975b606c134c1027">[VirusTotal / MAR]</a></p>
     <h3>Post-exploitation steps attempted on a GreyNoise sensor</h3>
     <p class="note">GreyNoise says the attacker did not gain a foothold on its sensor. The steps below show the attacker's playbook, not a successful compromise.</p>
     <ul>
@@ -243,6 +253,7 @@
           <li>The write-up screenshotted in that post also suggests: preserve the logs and any <code>nsaaad-*.gz</code> cores (<code>ls -lt /var/core</code>), check for a file <code>/v</code>, and check outbound firewall records for connections to <code>213.209.159.55:443</code> and <code>*.pyrlink.cc</code> (sic — the screenshot's spelling; the registered domain is <code>pylrk.cc</code>). It stresses that a negative search covers only retained logs and that attempts are not confirmed execution. Unverified, author not named. <a class="cite" href="https://cyberplace.social/@GossiTheDog/117372857146978531">[Beaumont post]</a></li>
           <li>Citrix has released a responder policy as a mitigation, distributed through Citrix Support (3 October, under NDA). It is not in the public post yet. The Poppelgaard checker verifies whether it is bound, alongside the earlier <code>RSP_POL_DROP</code> and community <code>pol_samlauth_block_v2</code> policies, and warns when a policy is bound but the Responder feature is disabled - the policy is then silently ignored. Beaumont reports the Support-shared policy "doesn't work for me" (Oct 2) and that "the Citrix support mitigations don't appear to work" (Oct 3). <a class="cite" href="https://github.com/ThomasPoppelgaard/netscaler-ctx697096-checker">[checker]</a></li>
           <li>On Citrix's post, a commenter (Jens Dellner) asks why Citrix has not published a Global Deny List of known-malicious IPs for this issue; Citrix has not replied. The site's blocklists are a partial stand-in, built only from public IoCs. <a class="cite" href="https://community.citrix.com/techzone-blogs/110_security-updates/security-update-guidance-for-netscaler-saml-authentication-deployments/">[Citrix post comments]</a></li>
+          <li><strong>Block <code>*.pylrk.cc</code> inbound and outbound</strong> (this site's recommendation, matching NCSC-NL's guidance of 3 October): inbound, the actor uses the domain as a payload-delivery source for the SAML attack; outbound, the FreeBSD Sliver implant found on compromised appliances beacons to it as C2 (hardcoded <code>https://www.pylrk.cc</code> in the implant, which also resolves its C2 via DNS). Use the <a class="button" href="/blocklist-domains.txt" download>domain blocklist</a> (<a class="button" href="/blocklist-domains-plain.txt" download>plain version</a>). Never block the resolved Cloudflare proxy IPs — block the DNS name. Hunt rather than only block: DNS and proxy logs for <code>*.pylrk.cc</code> tell you whether an appliance reached the domain before your block was in place.</li>
         </ul>
         <p class="src">Citrix says this is independent of CTX697096 and a bulletin is planned. Check the Citrix post for updates.</p>
       </article>

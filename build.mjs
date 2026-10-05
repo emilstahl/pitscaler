@@ -259,7 +259,9 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
     '- [Full text](https://pitscaler.com/llms-full.txt): same historical briefing as Markdown',
     '- [Public IoCs as CSV](https://pitscaler.com/iocs.csv): type, value, context, caveat, sharing, sources',
     '- [Firewall edge blocklist](https://pitscaler.com/blocklist.txt): the IPv4 rows that are safe to block, with the shared-infrastructure exclusions listed (Cloudflare WARP, VPN exits, residential/ISP, parking)',
-    '- [Plain IP blocklist](https://pitscaler.com/blocklist-plain.txt): one IP per line, same set', '',
+    '- [Plain IP blocklist](https://pitscaler.com/blocklist-plain.txt): one IP per line, same set',
+    '- [Domain blocklist](https://pitscaler.com/blocklist-domains.txt): *.pylrk.cc wildcard plus f.pylrk.cc — block inbound (payload delivery) AND outbound (Sliver C2 beacon) on the DNS name, never the Cloudflare proxy IPs',
+    '- [Plain domain blocklist](https://pitscaler.com/blocklist-domains-plain.txt): one name per line, same set', '',
     '## Dedicated pages', ''].concat(pages.map(p => '- [' + (out[p][0].match(/<title>(.*?)<\/title>/)[1].replace(/ \| PitScaler$/, '').replace(/&amp;/g, '&')) + '](https://pitscaler.com' + p + ')'), ['',
     '## Key sections', '',
     '- [Eight CVEs](https://pitscaler.com/#cves)'].concat(D.CVES.map(c => '- [' + c.id + '](https://pitscaler.com/#' + c.id.toLowerCase() + ')'), [
@@ -298,10 +300,37 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
   const blocklist = blHeader.join('\n') + '\n' + blockable.map(r => r.value).sort((a, b) => a.split('.').map(Number).reduce((x, n, i) => x * 256 + n, 0) - b.split('.').map(Number).reduce((x, n, i) => x * 256 + n, 0)).join('\n') + '\n';
   const blocklistTxt = '# See blocklist.txt for the annotated list. Plain one-IP-per-line version:\n\n' + blockable.map(r => r.value).sort((a, b) => a.split('.').map(Number).reduce((x, n, i) => x * 256 + n, 0) - b.split('.').map(Number).reduce((x, n, i) => x * 256 + n, 0)).join('\n') + '\n';
 
+  // Domain blocklist: campaign domains whose malware role is multi-source (embedded C2 strings,
+  // IR corroboration) or that NCSC-NL/Citrix-class guidance treats as blockable. Wildcard entries
+  // cover subdomain rotation. Deliberately excludes dual-use hunt leads (oast.fun, dnsl.cc,
+  // gs.thc.org) and the unregistered screenshot spellings (pyrlink.cc, pyrlnk.cc).
+  const domBlockable = D.IOCS.filter(r => r.type === 'Domain' && ['pylrk.cc', 'f.pylrk.cc'].includes(r.value));
+  const domHeader = [
+    '# PitScaler campaign-domain edge-blocklist (CVE-2026-88771/88772 and the 2 Oct SAML-issue chain)',
+    '# Generated ' + gen + ' from https://pitscaler.com/iocs.csv',
+    '# Block inbound AND outbound: the actor downloads payloads from these names (inbound to the appliance)',
+    '#   and the Sliver implant beacons out to them (outbound from the appliance).',
+    '# Wildcard semantics: a line "*.pylrk.cc." means the name and every subdomain of it (NCSC-NL guidance: block all subdomains).',
+    '# Read the caveats: https://pitscaler.com/iocs.csv',
+    '# These are Cloudflare-fronted names: block the DNS name, never the resolved proxy IPs.',
+    '# Blocking these is defence in depth, not incident response. A clean log proves nothing.',
+    '#',
+  ];
+  const domainBlocklist = domHeader.join('\n') + '\n' +
+    '# Wildcard: the C2 domain of the 2 Oct FreeBSD Sliver implant (embedded C2 string, Expel-corroborated MAR);\n' +
+    '# covers delivery subdomain f.pylrk.cc and rotation. Registered 2 Oct 06:56 UTC.\n' +
+    '*.pylrk.cc.\n' +
+    '# Wildcard: same campaign, subdomain-rotation coverage (spelled *.pylrk.cc in NCSC-NL guidance).\n' +
+    'pylrk.cc.\n' +
+    '# Delivery host of the FreeBSD Sliver implant (/HaKi2ufpiQ8AeVTZ/host), explicit single-name line for\n' +
+    '# resolvers/devices that do not support wildcards.\n' +
+    'f.pylrk.cc.\n';
+  const domainBlocklistPlain = '*.pylrk.cc\npylrk.cc\nf.pylrk.cc\n';
+
   const favicon = readIcon();
   return {
     ...out,
-    '/iocs.csv': [csv, 'text/csv; charset=utf-8'], '/blocklist.txt': [blocklist, 'text/plain; charset=utf-8'], '/blocklist-plain.txt': [blocklistTxt, 'text/plain; charset=utf-8'], '/favicon.svg': [favicon, 'image/svg+xml'], '/favicon.ico': [favicon, 'image/svg+xml'], '/logo.svg': [favicon, 'image/svg+xml'],
+    '/iocs.csv': [csv, 'text/csv; charset=utf-8'], '/blocklist.txt': [blocklist, 'text/plain; charset=utf-8'], '/blocklist-plain.txt': [blocklistTxt, 'text/plain; charset=utf-8'], '/blocklist-domains.txt': [domainBlocklist, 'text/plain; charset=utf-8'], '/blocklist-domains-plain.txt': [domainBlocklistPlain, 'text/plain; charset=utf-8'], '/favicon.svg': [favicon, 'image/svg+xml'], '/favicon.ico': [favicon, 'image/svg+xml'], '/logo.svg': [favicon, 'image/svg+xml'],
     ...(INDEXNOW_KEY ? { ['/' + INDEXNOW_KEY + '.txt']: [INDEXNOW_KEY, 'text/plain; charset=utf-8'] } : {}),
     '/': [pre, 'text/html; charset=utf-8'], '/style.css': [css, 'text/css; charset=utf-8'], '/app.js': [appJs, 'text/javascript; charset=utf-8'],
     '/static.html': [st, 'text/html; charset=utf-8'], '/index.md': [md, 'text/markdown; charset=utf-8'], '/llms-full.txt': [md, 'text/plain; charset=utf-8'],
@@ -361,7 +390,7 @@ export default {
     if (f[1].startsWith('text/markdown')) extra['x-markdown-tokens'] = String(Math.ceil(f[0].length / 4));
     if (['/index.md', '/llms.txt', '/llms-full.txt'].includes(path)) extra.link = '<https://pitscaler.com/>; rel="canonical"';
     if (path === '/iocs.csv') extra['content-disposition'] = 'attachment; filename="pitscaler-iocs.csv"';
-    if (path === '/blocklist.txt' || path === '/blocklist-plain.txt') extra['content-disposition'] = 'attachment; filename="' + path.slice(1) + '"';
+    if (path === '/blocklist.txt' || path === '/blocklist-plain.txt' || path === '/blocklist-domains.txt' || path === '/blocklist-domains-plain.txt') extra['content-disposition'] = 'attachment; filename="' + path.slice(1) + '"';
     return new Response(req.method === 'HEAD' ? null : f[0], { headers: hdr(f[1], extra) });
   }
 };
