@@ -45,8 +45,8 @@ var SOURCES = {
 
   gnblog:      { cat: 'telemetry', label: 'GreyNoise - Swarming Against Citrix 0-Day Exploitation (TLP:CLEAR IoCs, Sep 28)', url: 'https://www.greynoise.io/blog/swarming-against-citrix-0-day-exploitation' },
   gnchron:     { cat: 'telemetry', label: 'GreyNoise Chronicle - GNTL-20260928 CVE-2026-88771 timeline', url: 'https://www.greynoise.io/chronicle/gntl-20260928-citrix-cve-2026-88771' },
-  gnip:        { cat: 'telemetry', label: 'GreyNoise Visualizer - IP 149.104.78.141', url: 'https://viz.greynoise.io/ip/149.104.78.141' },
-  gntag:       { cat: 'telemetry', label: 'GreyNoise tag - Citrix NetScaler CVE-2026-88771 Login Command Injection RCE Attempt', url: 'https://viz.greynoise.io/tag/citrix-netscaler-cve-2026-88771-login-command-injection-rce-attempt' },
+  gnip:        { cat: 'telemetry', label: 'GreyNoise Visualizer - IP 149.104.78.141', url: 'https://viz.greynoise.io/ips/149.104.78.141' },
+  gntag:       { cat: 'telemetry', label: 'GreyNoise tag - Citrix NetScaler CVE-2026-88771 Login Command Injection RCE Attempt', url: 'https://viz.greynoise.io/tags/citrix-netscaler-cve-2026-88771-login-command-injection-rce-attempt' },
 
   kb1:         { cat: 'beaumont', label: 'Beaumont, Sep 27 - chained CVEs, webshells all September, "Probably nation state aligned"', url: 'https://cyberplace.social/@GossiTheDog/117343729453093307' },
   kb2:         { cat: 'beaumont', label: 'Beaumont, Sep 27 - patches live; detection script behind NDA; patching does not remove backdoors', url: 'https://cyberplace.social/@GossiTheDog/117343821114841048' },
