@@ -150,12 +150,12 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
     'CVE-2026-88776': { euvd: 'EUVD-2026-87971', cwe: 'CWE-119', nvd: 'Modified', pub: '2026-09-27 16:36', vec: 'CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:H/SC:N/SI:N/SA:N' },
     'CVE-2026-88777': { euvd: 'EUVD-2026-87972', cwe: 'CWE-119', nvd: 'Modified', pub: '2026-09-27 16:37', vec: 'CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:H/SC:N/SI:N/SA:N' },
     'CVE-2026-88778': { euvd: 'EUVD-2026-87973', cwe: 'CWE-342', nvd: 'Analyzed', pub: '2026-09-27 16:43', vec: 'CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:H/VA:H/SC:L/SI:L/SA:L' },
-    'CVE-2026-88779': { euvd: '', cwe: 'CWE-119', nvd: 'Undergoing Analysis (CNA score carried: CVSS 4.0 8.7 HIGH, Secondary)', pub: '2026-10-04 04:16', vec: 'CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N' }
+    'CVE-2026-88779': { euvd: '', cwe: 'CWE-119', nvd: 'Analyzed (5 Oct): NVD primary CVSS 3.1 7.5 HIGH (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H); CNA CVSS 4.0 8.7 HIGH carried as Secondary', pub: '2026-10-04 04:16', vec: 'CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N' }
   };
   const recordsHtml = c => { const r = REC[c.id]; if (!r) return ''; const k = KEV[c.id];
     const is88779 = c.id === 'CVE-2026-88779';
     return '<section class="wrap"><h2>' + esc(c.id) + ' vulnerability records</h2>' +
-      '<p>Official records for ' + esc(c.id) + ', checked on ' + (is88779 ? '5 October 2026' : '30 September 2026') + '. The CVE record was published by the CNA (NetScaler) at ' + r.pub + ' UTC' + (is88779 ? '; NVD lists it as Undergoing Analysis, carrying the CNA-provided CVSS 4.0 8.7 HIGH (Secondary) and CWE-119. NVD has not scored it independently yet' : '') + '.</p>' +
+      '<p>Official records for ' + esc(c.id) + ', checked on ' + (is88779 ? '6 October 2026' : '30 September 2026') + '. The CVE record was published by the CNA (NetScaler) at ' + r.pub + ' UTC' + (is88779 ? '. NVD finished its analysis on 5 October: its own primary score is CVSS 3.1 7.5 HIGH (availability impact), while the CNA-provided CVSS 4.0 8.7 HIGH is carried as Secondary. CWE-119 in both.' : '') + '.</p>' +
       '<div class="table-wrap" role="region" aria-label="Vulnerability records"><table class="facts"><tbody>' +
       '<tr><th scope="row">CVSS 4.0 vector</th><td><code>' + r.vec + '</code></td></tr>' +
       '<tr><th scope="row">Weakness (NVD)</th><td>' + esc(r.cwe) + '</td></tr>' +
