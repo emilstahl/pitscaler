@@ -268,7 +268,7 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
     '## Dedicated pages', ''].concat(pages.map(p => '- [' + (out[p][0].match(/<title>(.*?)<\/title>/)[1].replace(/ \| PitScaler$/, '').replace(/&amp;/g, '&')) + '](https://pitscaler.com' + p + ')'), ['',
     '## Key sections', '',
     '- [Eight CVEs](https://pitscaler.com/#cves)'].concat(D.CVES.map(c => '- [' + c.id + '](https://pitscaler.com/#' + c.id.toLowerCase() + ')'), [
-    '- [Timeline](https://pitscaler.com/#timeline)', '- [Public IoCs](https://pitscaler.com/#iocs)', '- [Detection](https://pitscaler.com/#detection)',
+    '- [Public IoCs](https://pitscaler.com/#iocs)', '- [Timeline](https://pitscaler.com/#timeline)', '- [Detection](https://pitscaler.com/#detection)',
     '- [Remediation](https://pitscaler.com/#remediation)', '- [FAQ](https://pitscaler.com/#faq)', '- [Sources](https://pitscaler.com/#sources)', '',
     '## Primary sources', '',
     '- [Citrix bulletin CTX697096](' + D.SOURCES.citrix.url + ')', '- [CISA alert](' + D.SOURCES.cisa.url + ')', '- [CISA KEV](' + D.SOURCES.kev.url + ')',

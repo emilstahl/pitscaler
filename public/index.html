@@ -38,8 +38,8 @@
     <ul>
       <li><a href="#overview">Overview</a></li>
       <!--CVEMENU-->
-      <li><a href="#timeline">Timeline</a></li>
       <li><a href="#iocs">IoCs</a></li>
+      <li><a href="#timeline">Timeline</a></li>
       <li><a href="#detection">Detection</a></li>
       <li><a href="#remediation">Remediation</a></li>
       <li><a href="#faq">FAQ</a></li>
@@ -162,7 +162,7 @@
       <p><strong>Indicators are not proof of compromise by themselves.</strong> Validate any hit against appliance logs, filesystem integrity, process history and configuration changes, following your incident-response procedure.</p>
       <p><strong>How to read these.</strong> Each indicator was observed by the source named in its row. None of them is a universal indicator for every victim. Beaumont reports that webshell names and attacker IPs are unique per victim. <a class="cite" href="https://cyberplace.social/@GossiTheDog/117351107654208046">[Beaumont]</a> <a class="cite" href="https://cyberplace.social/@GossiTheDog/117355208096613386">[Beaumont]</a> An empty search result proves nothing.</p>
     </div>
-    <p class="export"><a class="button" href="/iocs.csv" download>Download all IoCs as CSV</a> <a class="button" href="/blocklist.txt" download>Firewall blocklist (93 IPs, annotated)</a> <a class="button" href="/blocklist-plain.txt" download>Plain IP list</a> <a class="button" href="/blocklist-domains.txt" download>Domain blocklist (pylrk.cc wildcard, annotated)</a> <a class="button" href="/blocklist-domains-plain.txt" download>Plain domain list</a></p>
+    <p class="export"><a class="button" href="/iocs.csv" download>Download all IoCs as CSV</a> <a class="button" href="/blocklist.txt" download>Firewall blocklist (140 IPs, annotated)</a> <a class="button" href="/blocklist-plain.txt" download>Plain IP list</a> <a class="button" href="/blocklist-domains.txt" download>Domain blocklist (pylrk.cc wildcard, annotated)</a> <a class="button" href="/blocklist-domains-plain.txt" download>Plain domain list</a></p>
     <p class="note">The blocklist contains only the IPv4 indicators whose own source data does not warn against blocking. It excludes Cloudflare WARP egress, shared commercial VPN exits, residential/ISP (CGNAT) addresses and a domain-parking IP — those are in the CSV with their caveats. IPs differ per victim; a blocklist is defence in depth, not a substitute for patching and compromise checks.</p>
     <div class="ioc-tools">
       <label class="search" for="ioc-q">Filter indicators <input id="ioc-q" type="search" autocomplete="off" placeholder="e.g. sha256, receiver, 149.104"></label>
@@ -236,7 +236,7 @@
         <p class="src">Source: <a href="https://tenex.ai/blog/what-tenex-observed-inside-active-exploitation-of-netscaler-zero-day/">TENEX</a>. Appliance logs show attempts reaching the handler, not that commands ran.</p>
       </article>
       <article class="card">
-        <h3>Poppelgaard checker <span class="tag tag-research">Script, v1.11</span></h3>
+        <h3>Poppelgaard checker <span class="tag tag-research">Script, v1.14</span></h3>
         <p>A free, read-only shell script for the appliance (<code>sh ctx697096_check.sh --ioc</code>) that checks fixed-build status and public indicators, and tags each attack line as before or after the fix. Release 1.11 (2 Oct) adds a SAML status check based on Citrix's new guidance. Release 1.9 (1 Oct) adds Arctic Wolf's nsmon.pl implant, the Unit 42 <code>.deb</code> webshell and more attacker IPs. Its author says a clean result is not proof of a clean box; run it before rebooting or upgrading, and use it together with the Citrix IoC scan.</p>
         <p class="src">Source: <a href="https://github.com/ThomasPoppelgaard/netscaler-ctx697096-checker">Poppelgaard on GitHub</a>. A third-party tool; read it before you run it on a production appliance.</p>
       </article>

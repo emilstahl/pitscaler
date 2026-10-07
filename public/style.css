@@ -104,6 +104,7 @@ q { quotes: "\201C" "\201D"; font-style: italic; }
 .timeline li.k-research::before { border-color: var(--link); }
 .timeline li.k-telemetry::before { border-color: var(--violet); }
 .timeline li.k-reported::before { border-color: var(--amber); }
+.timeline li.k-community::before { border-color: #7fb3ff; }
 .timeline li.deadline::before { background: var(--red); border-color: var(--red); }
 .chip { display: inline-block; font-family: var(--mono); font-size: .82rem; background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: .05rem .5rem; margin-right: .4rem; }
 .tl-title { font-weight: 600; margin: .35rem 0 .25rem; }
