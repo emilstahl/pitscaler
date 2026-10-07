@@ -149,20 +149,6 @@
     <div id="cve-list" class="cves"></div>
   </section>
 
-  <section id="timeline" class="wrap" aria-labelledby="h-timeline">
-    <h2 id="h-timeline">Timeline</h2>
-    <p>Times are UTC unless marked otherwise. Events without a time show only their date. Expand an event to see its sources.</p>
-    <div class="filters" role="group" aria-label="Filter timeline by source type">
-      <button type="button" data-filter="all" aria-pressed="true">All</button>
-      <button type="button" data-filter="official" aria-pressed="false">Official advisory</button>
-      <button type="button" data-filter="research" aria-pressed="false">Research</button>
-      <button type="button" data-filter="telemetry" aria-pressed="false">Telemetry</button>
-      <button type="button" data-filter="reported" aria-pressed="false">Reported observation</button>
-    </div>
-    <p id="tl-count" class="note" aria-live="polite"></p>
-    <ol id="tl-list" class="timeline"></ol>
-  </section>
-
   <section id="iocs" class="wrap" aria-labelledby="h-iocs">
     <h2 id="h-iocs">Public IoCs <span class="tag tag-telemetry">Public / TLP:CLEAR only</span></h2>
     <p>This table only contains indicators that have been published openly. The Sharing column shows each source's own marking. <a class="cite" href="https://www.greynoise.io/blog/swarming-against-citrix-0-day-exploitation">[GreyNoise]</a> <a class="cite" href="https://ifin.network/t/multiple-citrix-netscaler-0-days-exploited/867">[IFIN]</a> <a class="cite" href="https://www.truesec.com/hub/blog/multiple-critical-vulnerabilities-in-citrix-netscaler-adc-and-netscaler-gateway">[Truesec]</a> <a class="cite" href="https://cloud.google.com/blog/topics/threat-intelligence/defending-against-active-exploitation-of-citrix-netscaler-adc-and-gateway-appliances">[GTIG/Mandiant]</a></p>
@@ -218,6 +204,20 @@
     </ul>
     <p>The token likely differs per victim, so search the file's content rather than relying on its hash.</p>
     <p class="note">Source: <a href="https://www.greynoise.io/blog/swarming-against-citrix-0-day-exploitation">GreyNoise, "Swarming Against Citrix 0-Day Exploitation"</a>. Victim-specific names and IPs from later IR-vendor writeups are deliberately left out. Beaumont warns that publishing them exposes organisations that have not yet remediated. <a class="cite" href="https://cyberplace.social/@GossiTheDog/117355208096613386">[Beaumont]</a></p>
+  </section>
+
+  <section id="timeline" class="wrap" aria-labelledby="h-timeline">
+    <h2 id="h-timeline">Timeline</h2>
+    <p>Times are UTC unless marked otherwise. Events without a time show only their date. Expand an event to see its sources.</p>
+    <div class="filters" role="group" aria-label="Filter timeline by source type">
+      <button type="button" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" data-filter="official" aria-pressed="false">Official advisory</button>
+      <button type="button" data-filter="research" aria-pressed="false">Research</button>
+      <button type="button" data-filter="telemetry" aria-pressed="false">Telemetry</button>
+      <button type="button" data-filter="reported" aria-pressed="false">Reported observation</button>
+    </div>
+    <p id="tl-count" class="note" aria-live="polite"></p>
+    <ol id="tl-list" class="timeline"></ol>
   </section>
 
   <section id="detection" class="wrap" aria-labelledby="h-detection">
