@@ -190,7 +190,7 @@ export function build(indexHtml, appJs, css, icon, updatedIso) {
       (faq ? '<section class="wrap"><h2>Questions about ' + esc(c.id) + '</h2>' + faq + '</section>' : '') +
       '<section class="wrap"><h2>Next steps</h2><ul><li><a href="/netscaler-detection/">How to detect NetScaler compromise</a></li><li><a href="/netscaler-iocs/">Public NetScaler IoCs</a></li><li><a href="/netscaler-remediation/">NetScaler remediation and fixed builds</a></li></ul></section>';
     page('/' + c.id.toLowerCase() + '/', c.id + ': Citrix NetScaler ' + SHORT[c.id] + ' | PitScaler',
-      c.id + ' in Citrix NetScaler ADC and Gateway: ' + SHORT[c.id] + ', ' + c.score + '. ' + (kev ? 'Exploited as a zero-day; in CISA KEV. ' : '') + 'Details, timeline, fixed builds and sources. As of 9 Oct 2026.',
+      c.id + ' in Citrix NetScaler ADC and Gateway: ' + SHORT[c.id] + ', ' + c.score + '. ' + (kev ? 'Exploited as a zero-day; in CISA KEV. ' : '') + 'Details, timeline, fixed builds and sources. As of 19 Oct 2026.',
       c.id + ': Citrix NetScaler ' + SHORT[c.id], c.id, body, [{ '@type': 'Thing', name: c.id, sameAs: 'https://www.cve.org/CVERecord?id=' + c.id }]);
   });
   page('/netscaler-iocs/', 'Citrix NetScaler IoCs: CVE-2026-88771 and CVE-2026-88772 | PitScaler',

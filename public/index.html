@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Citrix NetScaler Zero-Day: CVE-2026-88771 &amp; CVE-2026-88772 | PitScaler</title>
-<meta name="description" content="Citrix NetScaler ADC and Gateway zero-day vulnerabilities CVE-2026-88771 and CVE-2026-88772: remote code execution, the SAML CVE-2026-88779 DoS and the critical SAML RCE CVE-2026-107406, emergency shutdowns, fixed builds, IoCs. As of 9 Oct 2026.">
+<meta name="description" content="Citrix NetScaler ADC and Gateway zero-day vulnerabilities CVE-2026-88771 and CVE-2026-88772: remote code execution, the SAML CVE-2026-88779 DoS and the critical SAML RCE CVE-2026-107406, emergency shutdowns, fixed builds, IoCs. As of 19 Oct 2026.">
 <meta name="color-scheme" content="dark">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <link rel="canonical" href="https://pitscaler.com/">
@@ -14,13 +14,13 @@
 <meta property="og:site_name" content="PitScaler">
 <meta property="og:locale" content="en_US">
 <meta property="og:title" content="Citrix NetScaler Zero-Day: CVE-2026-88771 &amp; CVE-2026-88772 | PitScaler">
-<meta property="og:description" content="Citrix NetScaler ADC and Gateway zero-day vulnerabilities CVE-2026-88771 and CVE-2026-88772: remote code execution, the SAML CVE-2026-88779 DoS and the critical SAML RCE CVE-2026-107406, emergency shutdowns, fixed builds, IoCs. As of 9 Oct 2026.">
+<meta property="og:description" content="Citrix NetScaler ADC and Gateway zero-day vulnerabilities CVE-2026-88771 and CVE-2026-88772: remote code execution, the SAML CVE-2026-88779 DoS and the critical SAML RCE CVE-2026-107406, emergency shutdowns, fixed builds, IoCs. As of 19 Oct 2026.">
 <meta property="og:url" content="https://pitscaler.com/">
 <meta property="article:published_time" content="2026-09-29">
 <meta property="article:modified_time" content="{{UPDATED_ISO}}">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Citrix NetScaler Zero-Day: CVE-2026-88771 &amp; CVE-2026-88772 | PitScaler">
-<meta name="twitter:description" content="Citrix NetScaler ADC and Gateway zero-day vulnerabilities CVE-2026-88771 and CVE-2026-88772: remote code execution, the SAML CVE-2026-88779 DoS and the critical SAML RCE CVE-2026-107406, emergency shutdowns, fixed builds, IoCs. As of 9 Oct 2026.">
+<meta name="twitter:description" content="Citrix NetScaler ADC and Gateway zero-day vulnerabilities CVE-2026-88771 and CVE-2026-88772: remote code execution, the SAML CVE-2026-88779 DoS and the critical SAML RCE CVE-2026-107406, emergency shutdowns, fixed builds, IoCs. As of 19 Oct 2026.">
 <!--JSONLD-->
 <link rel="stylesheet" href="/style.css">
 <link rel="alternate" type="text/markdown" href="https://pitscaler.com/index.md" title="PitScaler Markdown briefing">
@@ -163,7 +163,7 @@
       <p><strong>Indicators are not proof of compromise by themselves.</strong> Validate any hit against appliance logs, filesystem integrity, process history and configuration changes, following your incident-response procedure.</p>
       <p><strong>How to read these.</strong> Each indicator was observed by the source named in its row. None of them is a universal indicator for every victim. Beaumont reports that webshell names and attacker IPs are unique per victim. <a class="cite" href="https://cyberplace.social/@GossiTheDog/117351107654208046">[Beaumont]</a> <a class="cite" href="https://cyberplace.social/@GossiTheDog/117355208096613386">[Beaumont]</a> An empty search result proves nothing.</p>
     </div>
-    <p class="export"><a class="button" href="/iocs.csv" download>Download all IoCs as CSV</a> <a class="button" href="/blocklist.txt" download>Firewall blocklist (140 IPs, annotated)</a> <a class="button" href="/blocklist-plain.txt" download>Plain IP list</a> <a class="button" href="/blocklist-domains.txt" download>Domain blocklist (pylrk.cc wildcard, annotated)</a> <a class="button" href="/blocklist-domains-plain.txt" download>Plain domain list</a></p>
+    <p class="export"><a class="button" href="/iocs.csv" download>Download all IoCs as CSV</a> <a class="button" href="/blocklist.txt" download>Firewall blocklist (180 IPs, annotated)</a> <a class="button" href="/blocklist-plain.txt" download>Plain IP list</a> <a class="button" href="/blocklist-domains.txt" download>Domain blocklist (pylrk.cc wildcard, annotated)</a> <a class="button" href="/blocklist-domains-plain.txt" download>Plain domain list</a></p>
     <p class="note">The blocklist contains only the IPv4 indicators whose own source data does not warn against blocking. It excludes Cloudflare WARP egress, shared commercial VPN exits, residential/ISP (CGNAT) addresses and a domain-parking IP — those are in the CSV with their caveats. IPs differ per victim; a blocklist is defence in depth, not a substitute for patching and compromise checks.</p>
     <div class="ioc-tools">
       <label class="search" for="ioc-q">Filter indicators <input id="ioc-q" type="search" autocomplete="off" placeholder="e.g. sha256, receiver, 149.104"></label>
@@ -223,7 +223,7 @@
 
   <section id="detection" class="wrap" aria-labelledby="h-detection">
     <h2 id="h-detection">Detection and hunting for NetScaler compromise</h2>
-    <p><strong>In short:</strong> review <code>httpd.conf</code> for PHP handler and AliasMatch changes, look for PHP files in VPN script and media directories, check <code>/bin/sh</code> for setuid, and correlate DTLSv1.0 handshake failures with NSPPE crashes. watchTowr's honeypot analysis (7 Oct) adds the behavioral patterns its sensors saw most: the poisoned log line itself (<code>pitboss ... PPE ... unexpectedly died / missed too many heartbeats</code> followed by shell metacharacters), the stylesheet webshell (<code>Alias</code>/<code>AliasMatch</code> mapping <code>...style.min.&lt;hex&gt;.css</code> to a hidden dotfile, bursts of POSTs to <code>/logon/LogonPoint/css/*</code>), unexpected egress DNS/HTTP from the appliance to OOB domains, and rogue <code>superuser</code> accounts in <code>/flash/nsconfig/ns.conf</code> such as <code>gw_health</code>. Sources: GTIG/Mandiant, CERT-EU, GreyNoise and watchTowr, as of 9 October 2026. <a class="cite" href="https://cloud.google.com/blog/topics/threat-intelligence/defending-against-active-exploitation-of-citrix-netscaler-adc-and-gateway-appliances">[GTIG/Mandiant]</a> <a class="cite" href="https://www.cert.europa.eu/blog/taking-execute-logging-a-bit-too-literally-cve-2026-88771">[CERT-EU]</a> <a class="cite" href="https://watchtowr.com/intelligence/post-exploitation-analysis-artifacts-citrix-netscaler-cve-2026-88771/">[watchTowr]</a></p>
+    <p><strong>In short:</strong> review <code>httpd.conf</code> for PHP handler and AliasMatch changes, look for PHP files in VPN script and media directories, check <code>/bin/sh</code> for setuid, and correlate DTLSv1.0 handshake failures with NSPPE crashes. watchTowr's honeypot analysis (7 Oct) adds the behavioral patterns its sensors saw most: the poisoned log line itself (<code>pitboss ... PPE ... unexpectedly died / missed too many heartbeats</code> followed by shell metacharacters), the stylesheet webshell (<code>Alias</code>/<code>AliasMatch</code> mapping <code>...style.min.&lt;hex&gt;.css</code> to a hidden dotfile, bursts of POSTs to <code>/logon/LogonPoint/css/*</code>), unexpected egress DNS/HTTP from the appliance to OOB domains, and rogue <code>superuser</code> accounts in <code>/flash/nsconfig/ns.conf</code> such as <code>gw_health</code>. Zscaler ThreatLabz (16 Oct) adds the staged-chain artifacts: <code>INDEX:</code>-prefixed base64 User-Agent strings parked in HTTP access logs, forged pitboss triggers carrying <code>grep INDEX: /var/log/htt* | sed ... | b64decode -r | sh</code>, <code>Nx_&lt;n&gt;</code>.html/.php/.pl files across six web directories, and <code>php_engine</code> / <code>AddHandler cgi-script .pl</code> enablement in <code>/etc/httpd.conf</code>. Sources: GTIG/Mandiant, CERT-EU, GreyNoise, watchTowr and Zscaler, as of 19 October 2026. <a class="cite" href="https://cloud.google.com/blog/topics/threat-intelligence/defending-against-active-exploitation-of-citrix-netscaler-adc-and-gateway-appliances">[GTIG/Mandiant]</a> <a class="cite" href="https://www.cert.europa.eu/blog/taking-execute-logging-a-bit-too-literally-cve-2026-88771">[CERT-EU]</a> <a class="cite" href="https://watchtowr.com/intelligence/post-exploitation-analysis-artifacts-citrix-netscaler-cve-2026-88771/">[watchTowr]</a> <a class="cite" href="https://www.zscaler.com/blogs/security-research/cve-2026-88771-inside-exploitation-critical-netscaler-rce-vulnerability">[Zscaler]</a></p>
     <div class="callout callout-soft"><p><strong>A clean scan does not clear a host.</strong> A checker can miss a planted webshell, especially when logs have rotated or permissions were changed.</p></div>
     <div class="grid2">
       <article class="card">
@@ -308,6 +308,26 @@ command_attempted = arrayindex(regextract(_raw_log, "pitboss PPE unexpectedly di
         <p class="src">Source: <a href="https://github.com/cisagov/SIGMA_Rules/blob/develop/CMA_SIGMA_Citrix_CVE_2026_8871.yaml">CISA SIGMA Rules repository</a>; <a href="https://www.cisa.gov/news-events/alerts/2026/09/27/critical-zero-day-vulnerabilities-exploited-citrix-netscaler-adc-gateway">CISA alert, updated Oct 2</a>. Every keyword in the rule was already on this page's IoC table and detection cards; the rule bundles them into SIEM queries.</p>
       </article>
       <article class="card">
+        <h3>Zscaler ThreatLabz hunt commands <span class="tag tag-research">FreeBSD shell</span></h3>
+        <p>Zscaler's 16 October analysis (hunt commands it credits to Sh3llc0de) runs in the appliance FreeBSD shell and checks processes, startup persistence, cron, fresh web files and crash dumps; the IoC table's source IPs are listed above.</p>
+        <pre><code># Inspect running processes for suspicious shells spawned by nsppe
+ps aux | grep -E "sh|bash|python|perl|nc|curl|wget" | grep -v "nsconmsg"
+# Check the startup script for unauthorized modifications
+cat /flash/nsconfig/rc.netscaler
+# Audit cron jobs
+crontab -l; cat /etc/crontab
+# Find web files created or modified in the last 3 days
+find /netscaler/ns_gui/ -type f -mtime -3
+find /var/netscaler/gui/ -type f -mtime -3
+# Review crash dumps and core files
+ls -la /var/crash/; ls -la /var/core/
+# Check for child shells under the nobody service account and unmapped listeners
+ps aux | grep -E "(sh|bash|python|perl|nc)"
+netstat -an | grep LISTEN</code></pre>
+        <p>Zscaler also recommends searching HTTP access logs for <code>INDEX:</code> User-Agent values and for the GET paths the staged chain used, reviewing authentication and system logs for forged <code>pitboss PPE</code> messages containing shell syntax, comparing <code>/etc/httpd.conf</code> with a known-good system (especially unexpected PHP or CGI enablement), investigating appliance-initiated connections (especially downloads from unfamiliar IPs), and rotating credentials, tokens and certificates after containment.</p>
+        <p class="src">Source: <a href="https://www.zscaler.com/blogs/security-research/cve-2026-88771-inside-exploitation-critical-netscaler-rce-vulnerability">Zscaler ThreatLabz</a>; hunt commands per Sh3llc0de as credited there.</p>
+      </article>
+      <article class="card">
         <h3>CIRCL TR-100 <span class="tag tag-official">Config check</span></h3>
         <p>For each CVE, CIRCL gives CLI commands that check whether your appliance's configuration exposes it. Run them on appliances you administer.</p>
         <p class="src">Source: <a href="https://www.circl.lu/pub/tr-100/">CIRCL TR-100</a></p>
@@ -379,7 +399,7 @@ command_attempted = arrayindex(regextract(_raw_log, "pitboss PPE unexpectedly di
 
   <section id="remediation" class="wrap" aria-labelledby="h-remediation">
     <h2 id="h-remediation">Remediation: patching NetScaler ADC and Gateway</h2>
-    <p><strong>In short:</strong> check for compromise and preserve evidence first, then upgrade to 14.1-73.46 or 13.1-64.29 or later (FIPS/NDcPP builds below) - one upgrade that covers CTX697096, CVE-2026-88779 and CVE-2026-107406, per Citrix as of 9 October 2026. Patching does not remove an existing backdoor. <a class="cite" href="https://support.citrix.com/external/article/CTX697191/citrix-netscaler-adc-and-citrix-netscale.html">[Citrix CTX697191]</a></p>
+    <p><strong>In short:</strong> check for compromise and preserve evidence first, then upgrade to 14.1-73.46 or 13.1-64.29 or later (FIPS/NDcPP builds below) - one upgrade that covers CTX697096, CVE-2026-88779 and CVE-2026-107406, per Citrix as of 19 October 2026. Patching does not remove an existing backdoor. <a class="cite" href="https://support.citrix.com/external/article/CTX697191/citrix-netscaler-adc-and-citrix-netscale.html">[Citrix CTX697191]</a></p>
     <p class="note"><strong>CVE-2026-107406 (8 Oct): SAML deployments must upgrade again - a third time.</strong> Citrix published CTX697191 for a SAML memory overflow leading to remote code execution or denial of service, CVSS v4.0 9.5. On the builds fixed for the earlier bulletins (14.1-73.37 to 73.41, 13.1-64.23 to 64.28 and the FIPS/NDcPP equivalents) only an appliance configured as a SAML IdP (<code>add authentication samlIdPProfile</code>) is affected; on older builds a SAML SP (<code>add authentication samlAction</code>) or IdP. The 73.46 / 64.29 / 37.283 generation fixes everything at once. The bulletin lists no workaround. Citrix says - per secondary coverage of its customer guidance - that it is not aware of any unmitigated exploits, and the CVE is not in CISA KEV. <a class="cite" href="https://support.citrix.com/external/article/CTX697191/citrix-netscaler-adc-and-citrix-netscale.html">[Citrix CTX697191]</a> <a class="cite" href="https://securityonline.info/citrix-netscaler-vulnerability-cve-2026-107406">[Security Online]</a></p>
     <h3>Fixed builds (Citrix CTX697096, CTX697174 and CTX697191)</h3>
     <div class="table-wrap" tabindex="0" role="region" aria-label="Fixed builds table">
